@@ -302,7 +302,6 @@ export function useDeleteCategoryMutation(userId?: string) {
       const bookmarksKey = getBookmarksQueryKey(userId);
       await queryClient.cancelQueries({ queryKey: bookmarksKey });
       const previousBookmarks = queryClient.getQueryData<BookmarkItem[]>(bookmarksKey) || [];
-      const deletedBookmarks = previousBookmarks.filter(bm => bm.categoryId === categoryId || bm.category?.id === categoryId);
 
       queryClient.setQueryData<BookmarkItem[]>(bookmarksKey, (old = []) =>
         old.filter(bm => bm.categoryId !== categoryId && bm.category?.id !== categoryId)

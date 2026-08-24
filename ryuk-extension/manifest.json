@@ -1,20 +1,41 @@
 {
   "manifest_version": 3,
-  "name": "Ryuk — Bookmark Manager",
-  "version": "1.0.0",
-  "description": "1-click tab bookmarking for Ryuk Bookmark Manager.",
+  "name": "Devnest — Bookmark Manager",
+  "version": "2.0.0",
+  "description": "Persistent side panel bookmark manager & context menu notes clipper for Devnest.",
   "permissions": [
+    "sidePanel",
     "activeTab",
     "storage",
     "scripting",
-    "tabs"
+    "tabs",
+    "contextMenus",
+    "notifications"
   ],
   "host_permissions": [
     "<all_urls>"
   ],
+  "background": {
+    "service_worker": "background/service-worker.js",
+    "type": "module"
+  },
+  "side_panel": {
+    "default_path": "sidepanel/index.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content/content-script.js"],
+      "css": ["content/styles/content-style.css"],
+      "run_at": "document_end"
+    }
+  ],
+  "icons": {
+    "128": "icon128.png"
+  },
   "action": {
-    "default_title": "Save to Ryuk",
-    "default_popup": "popup.html"
+    "default_title": "Open Devnest Side Panel",
+    "default_icon": "icon128.png"
   },
   "options_ui": {
     "page": "options.html",

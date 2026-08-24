@@ -14,8 +14,8 @@ export function useNotes() {
       const data = await res.json();
       return (data.notes as Note[]) || [];
     },
-    staleTime: 5 * 60 * 1000,
-    refetchOnWindowFocus: false,
+    staleTime: 10 * 1000,
+    refetchOnWindowFocus: true,
   });
 
   const saveNoteMutation = useMutation({

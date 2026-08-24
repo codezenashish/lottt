@@ -11,6 +11,8 @@ import {
   Check,
   Pin,
   Star,
+  ExternalLink,
+  Globe,
 } from "lucide-react";
 import { clsx } from "clsx";
 
@@ -24,9 +26,51 @@ export interface Note {
   isPinned?: boolean;
   isBookmarked?: boolean;
   folderId?: string | null;
+  sourceUrl?: string | null;
+  sourceTitle?: string | null;
+  selectedText?: string | null;
+  sourceAnchor?: string | null;
+  referenceId?: string | null;
   userId: string;
   createdAt: string | Date;
   updatedAt: string | Date;
+}
+
+export function getReferenceUrl(note: Note): string {
+  if (!note.sourceUrl) return "";
+  let anchor: { text?: string; prefix?: string; suffix?: string; selector?: string; startOffset?: number; endOffset?: number } = {};
+  if (note.sourceAnchor) {
+    try {
+      anchor = typeof note.sourceAnchor === "string" ? JSON.parse(note.sourceAnchor) : note.sourceAnchor;
+    } catch {
+      // Ignore JSON parse errors
+    }
+  }
+  const textToUse = note.selectedText || anchor.text || note.content || "";
+  const prefix = anchor.prefix || "";
+  const suffix = anchor.suffix || "";
+
+  let textFragment = "";
+  if (textToUse) {
+    const p = prefix ? `${encodeURIComponent(prefix.trim().slice(-40))}-,` : "";
+    const s = suffix ? `,-${encodeURIComponent(suffix.trim().slice(0, 40))}` : "";
+    const t = encodeURIComponent(textToUse.trim());
+    textFragment = `:~:text=${p}${t}${s}`;
+  }
+
+  const refPayload = {
+    referenceId: note.referenceId || "",
+    selectedText: textToUse,
+    prefix: prefix,
+    suffix: suffix,
+    selector: anchor.selector || "",
+    startOffset: anchor.startOffset,
+    endOffset: anchor.endOffset,
+  };
+  const refFragment = `ryuk-ref=${encodeURIComponent(JSON.stringify(refPayload))}`;
+
+  const [baseUrl] = note.sourceUrl.split("#");
+  return `${baseUrl}#${refFragment}&${textFragment}`;
 }
 
 interface NotesCardProps {
@@ -95,9 +139,24 @@ export function NotesCard({
               {note.title || "Untitled Note"}
               {note.isBookmarked && <Star className="w-3.5 h-3.5 text-yellow-500 fill-yellow-500" />}
             </h4>
-            <p className="text-xs text-muted-foreground font-sans truncate">
-              {textPreview || "Empty content..."}
-            </p>
+            <div className="flex items-center gap-2">
+              <p className="text-xs text-muted-foreground font-sans truncate">
+                {textPreview || "Empty content..."}
+              </p>
+              {note.sourceUrl && (
+                <a
+                  href={getReferenceUrl(note)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 transition-colors shrink-0"
+                  title={note.sourceTitle || note.sourceUrl}
+                >
+                  <span>Source → Open selection</span>
+                  <ExternalLink className="w-3 h-3" />
+                </a>
+              )}
+            </div>
           </div>
         </div>
 
@@ -180,19 +239,34 @@ export function NotesCard({
       <div>
         <div className="flex items-center justify-between gap-2 mb-2">
           <div className="flex items-center gap-2 overflow-hidden">
-            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg text-[11px] font-medium bg-card text-muted-foreground border border-border">
-              {note.isPinned ? (
-                <>
-                  <Pin className="w-3 h-3 text-primary fill-primary/20" />
-                  Pinned
-                </>
-              ) : (
-                <>
-                  <FileText className="w-3 h-3" />
-                  Note
-                </>
-              )}
-            </span>
+            {note.sourceUrl ? (
+              <a
+                href={getReferenceUrl(note)}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-[11px] font-medium bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 transition-colors"
+                title={note.sourceTitle || note.sourceUrl}
+              >
+                <Globe className="w-3 h-3 text-primary shrink-0" />
+                <span>Source → Open selection</span>
+                <ExternalLink className="w-3 h-3 shrink-0" />
+              </a>
+            ) : (
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg text-[11px] font-medium bg-card text-muted-foreground border border-border">
+                {note.isPinned ? (
+                  <>
+                    <Pin className="w-3 h-3 text-primary fill-primary/20" />
+                    Pinned
+                  </>
+                ) : (
+                  <>
+                    <FileText className="w-3 h-3" />
+                    Note
+                  </>
+                )}
+              </span>
+            )}
           </div>
 
           <div className="flex items-center gap-1 opacity-80 group-hover:opacity-100 transition-opacity">

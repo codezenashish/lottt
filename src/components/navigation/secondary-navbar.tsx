@@ -93,7 +93,7 @@ export function SecondaryNavbar() {
   const currentCategoryId =
     typeof selectedCategoryId === "string"
       ? selectedCategoryId
-      : (selectedCategoryId as any)?.id || null;
+      : (selectedCategoryId as { id?: string } | null)?.id || null;
 
   const fetchedCategories = queryCategories || storeCategories;
 

@@ -1,233 +1,297 @@
 'use client'
 
 import { useState } from 'react'
+import { Terminal, Copy, Check, Command } from 'lucide-react'
+
+interface TerminalLine {
+  text: string
+  type: 'command' | 'info' | 'success' | 'highlight' | 'url' | 'muted' | 'empty'
+}
 
 interface CliTabEntry {
   id: string
   label: string
+  category: string
   tagline: string
+  description: string
   command: string
-  pkg: string
-  size: string
-  deps: string
-  since: string
+  highlights: string[]
   filePath: string
-  terminalOutput: string[]
+  terminalOutput: TerminalLine[]
 }
 
 const entries: CliTabEntry[] = [
   {
+    id: 'bookmarks',
+    label: 'ryuk add',
+    category: 'Bookmarks & Web Clipper',
+    tagline: 'Instant web clipping & metadata extraction',
+    description:
+      'Save links directly from your terminal. Ryuk automatically parses OpenGraph tags to extract titles, descriptions, and favicons with zero manual work.',
+    command: 'ryuk add https://nextjs.org/docs',
+    highlights: [
+      'Automatic title, description & favicon parsing',
+      'Instant cloud sync to your Ryuk workspace',
+      'Custom category tagging & search indexing',
+    ],
+    filePath: 'ryuk add <url>',
+    terminalOutput: [
+      { text: '$ ryuk add https://nextjs.org/docs', type: 'command' },
+      { text: 'Fetching metadata for https://nextjs.org/docs...', type: 'info' },
+      { text: '✔ Fetched title: "Next.js Documentation"', type: 'success' },
+      { text: '✔ Detected favicon: https://nextjs.org/favicon.ico', type: 'success' },
+      { text: '✔ Bookmark saved successfully!', type: 'success' },
+      { text: '  Title: Next.js Documentation', type: 'muted' },
+      { text: '  URL:   https://nextjs.org/docs', type: 'url' },
+      { text: '', type: 'empty' },
+      { text: '$ ryuk bookmark list --limit 2', type: 'command' },
+      { text: '1. Next.js Documentation [Documentation]', type: 'highlight' },
+      { text: '   URL: https://nextjs.org/docs', type: 'muted' },
+    ],
+  },
+  {
     id: 'notes',
     label: 'ryuk notes',
-    tagline: 'Create, edit & search notes directly from CLI',
-    command: 'ryuk notes add "Meeting notes"',
-    pkg: '@ryuk/cli',
-    size: '1.2 MB',
-    deps: '0 dependencies',
-    since: 'v1.0.0',
-    filePath: 'user@temp.email',
+    category: 'Notes & Code Snippets',
+    tagline: 'Terminal markdown & snippet manager',
+    description:
+      'Capture thoughts, architecture decisions, and code snippets straight from the shell with rich terminal markdown and code syntax formatting.',
+    command: 'ryuk notes add "API Architecture"',
+    highlights: [
+      'Terminal-rendered markdown, task lists & tables',
+      'Language-tagged code snippet management',
+      'Quick interactive CLI editor integration',
+    ],
+    filePath: 'ryuk notes add',
     terminalOutput: [
-      '$ ryuk notes add "API Architecture & Design" --tag dev',
-      '✔ Created note [id: nt_892a]',
-      '✔ Synced with Ryuk Cloud',
-      '',
-      '$ ryuk notes list --limit 2',
-      '┌─────────┬────────────────────────────────┬─────────────┐',
-      '│ ID      │ TITLE                          │ UPDATED     │',
-      '├─────────┼────────────────────────────────┼─────────────┤',
-      '│ nt_892a │ API Architecture & Design      │ Just now    │',
-      '│ nt_410b │ Next.js agent setup rules      │ 1 hour ago  │',
-      '└─────────┴────────────────────────────────┴─────────────┘',
+      { text: '$ ryuk notes add "API Architecture" --snippet', type: 'command' },
+      { text: 'Ryuk Add Note (alex@example.com)', type: 'info' },
+      { text: '? Note Title: API Architecture & Auth Flow', type: 'muted' },
+      { text: '? Language: typescript', type: 'muted' },
+      { text: '✔ Note saved successfully!', type: 'success' },
+      { text: '  ID:    nt_982a', type: 'muted' },
+      { text: '  Title: API Architecture & Auth Flow', type: 'muted' },
+      { text: '', type: 'empty' },
+      { text: '$ ryuk notes list', type: 'command' },
+      { text: '1. API Architecture & Auth Flow [typescript]', type: 'highlight' },
+      { text: '   Content: export async function verifySession(token: string)...', type: 'muted' },
     ],
   },
   {
-    id: 'bookmarks',
-    label: 'ryuk bookmarks',
-    tagline: 'Save links, auto-fetch favicons & organize tags',
-    command: 'ryuk bookmarks add https://github.com/codezenashish/ryuk',
-    pkg: '@ryuk/cli',
-    size: '1.2 MB',
-    deps: '0 dependencies',
-    since: 'v1.0.0',
-    filePath: 'user@temp.email',
+    id: 'search',
+    label: 'ryuk search',
+    category: 'Interactive Fuzzy Search',
+    tagline: 'Realtime search across bookmarks & notes',
+    description:
+      'Search across all your resources simultaneously using fuzzy matching, autocomplete suggestions, and quick actions to open links in your default browser.',
+    command: 'ryuk search',
+    highlights: [
+      'Interactive fuzzy autocomplete with arrow navigation',
+      'One-key "Open in Browser" action',
+      'Unified search across titles, URLs, and notes',
+    ],
+    filePath: 'ryuk search',
     terminalOutput: [
-      '$ ryuk bookmarks add https://github.com/codezenashish/ryuk --tag dev',
-      '✔ Fetched title: "codezenashish/ryuk"',
-      '✔ Detected favicon: https://github.com/favicon.ico',
-      '✔ Bookmark saved [id: bm_104f]',
-      '',
-      '$ ryuk bookmarks list --tag dev',
-      '★ https://github.com/codezenashish/ryuk [#dev]',
-      '★ https://nextjs.org/docs [#dev]',
+      { text: '$ ryuk search', type: 'command' },
+      { text: '? Search Category: Bookmarks', type: 'muted' },
+      { text: '? Search Bookmarks: ❯ Next.js Documentation (https://nextjs.org/docs)', type: 'info' },
+      { text: '', type: 'empty' },
+      { text: 'Title:       Next.js Documentation', type: 'highlight' },
+      { text: 'URL:         https://nextjs.org/docs', type: 'url' },
+      { text: 'Category:    Documentation', type: 'muted' },
+      { text: '', type: 'empty' },
+      { text: '? Action: ❯ Open in Browser', type: 'muted' },
+      { text: '✔ Opening https://nextjs.org/docs in default browser...', type: 'success' },
     ],
   },
   {
-    id: 'sync',
-    label: 'ryuk sync',
-    tagline: 'Realtime synchronization across web & mobile',
-    command: 'ryuk sync --status',
-    pkg: '@ryuk/cli',
-    size: '1.2 MB',
-    deps: '0 dependencies',
-    since: 'v1.0.0',
-    filePath: 'user@temp.email',
-    terminalOutput: [
-      '$ ryuk sync --status',
-      '● Connection: Connected (wss://api.ryuk.app)',
-      '● Local cache: Up to date (342 objects)',
-      '● Last sync: 12 seconds ago',
-      '✔ All notes & bookmarks in sync.',
+    id: 'status',
+    label: 'ryuk login',
+    category: 'Auth & Offline Caching',
+    tagline: 'One-time authentication with smart cache',
+    description:
+      'Connect your terminal to your Ryuk account with an API key. Local 60-second caching ensures lightning-fast queries and smooth offline workflow.',
+    command: 'ryuk login',
+    highlights: [
+      'Secure credentials storage in ~/.ryukrc',
+      'Switch between Cloud and Local Dev seamlessly',
+      'Zero-latency responses via local disk cache',
     ],
-  },
-  {
-    id: 'export',
-    label: 'ryuk export',
-    tagline: 'Export your data anytime in open formats',
-    command: 'ryuk export --format json',
-    pkg: '@ryuk/cli',
-    size: '1.2 MB',
-    deps: '0 dependencies',
-    since: 'v1.0.0',
-    filePath: 'user@temp.email',
+    filePath: 'ryuk status',
     terminalOutput: [
-      '$ ryuk export --format markdown --out ./backups',
-      '✔ Exporting notes (48 files)... done',
-      '✔ Exporting bookmarks (120 links)... done',
-      '✔ Saved backup to ./backups/ryuk-export-2026.zip',
+      { text: '$ ryuk status', type: 'command' },
+      { text: 'Ryuk Status (alex@example.com)', type: 'info' },
+      { text: 'Authenticated User: alex@example.com', type: 'success' },
+      { text: 'Display Name:       Alex Developer', type: 'muted' },
+      { text: 'Server URL:         https://ryuk-vert.vercel.app', type: 'muted' },
+      { text: 'Config File:        ~/.ryukrc', type: 'muted' },
+      { text: '✔ All bookmarks & notes synced with cloud.', type: 'success' },
     ],
   },
 ]
 
-const tabBase =
-  'flex shrink-0 cursor-pointer items-center gap-2.5 border-0 border-r border-border px-[22px] py-4 text-sm font-medium whitespace-nowrap transition'
-const tabIdle = 'bg-transparent text-muted-foreground hover:bg-muted hover:text-muted-foreground'
-const tabActive =
-  'bg-[#131313] text-foreground shadow-[inset_0_-2px_0_var(--color-ink)]'
-const buttonClass =
-  'inline-flex cursor-pointer items-center gap-2 rounded-lg border border-border bg-muted px-4 py-2.5 text-sm font-medium whitespace-nowrap text-foreground transition hover:border-foreground/20 hover:bg-card active:translate-y-px'
-
 export function TerminalShowcase() {
-  const [activeId, setActiveId] = useState('notes')
-  const [copiedInstall, setCopiedInstall] = useState(false)
+  const [activeId, setActiveId] = useState('bookmarks')
+  const [copiedType, setCopiedType] = useState<'command' | 'install' | null>(null)
 
   const active = entries.find((entry) => entry.id === activeId) ?? entries[0]
 
-  async function copyInstall() {
-    const command = `npm i -g ${active.pkg}`
+  async function copyText(text: string, type: 'command' | 'install') {
     try {
-      await navigator.clipboard.writeText(command)
-      setCopiedInstall(true)
-      window.setTimeout(() => setCopiedInstall(false), 1500)
+      await navigator.clipboard.writeText(text)
+      setCopiedType(type)
+      setTimeout(() => setCopiedType(null), 2000)
+      window.dispatchEvent(
+        new CustomEvent('ryuk:toast', {
+          detail: type === 'command' ? 'Copied command to clipboard' : 'Copied install script',
+        }),
+      )
     } catch {
       return
     }
   }
 
   return (
-    <div className="overflow-hidden rounded-[14px] border border-border bg-[#0d0d0d]">
-      <div className="flex overflow-x-auto border-b border-border">
-        {entries.map((entry) => (
-          <button
-            key={entry.id}
-            type="button"
-            onClick={() => setActiveId(entry.id)}
-            className={`${tabBase} ${activeId === entry.id ? tabActive : tabIdle}`}
-          >
-            {entry.label}
-          </button>
-        ))}
+    <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-colors">
+      {/* Tabs Header */}
+      <div className="flex items-center overflow-x-auto border-b border-border bg-muted/40 px-3 pt-3 gap-1.5 scrollbar-none">
+        {entries.map((entry) => {
+          const isActive = activeId === entry.id
+          return (
+            <button
+              key={entry.id}
+              type="button"
+              onClick={() => setActiveId(entry.id)}
+              className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-t-lg font-mono text-xs font-medium transition-all cursor-pointer whitespace-nowrap ${
+                isActive
+                  ? 'bg-card text-foreground border-t border-x border-border shadow-xs relative -mb-px font-semibold'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-muted/70'
+              }`}
+            >
+              <Terminal className={`h-3.5 w-3.5 ${isActive ? 'text-primary' : 'text-muted-foreground'}`} />
+              <span>{entry.label}</span>
+            </button>
+          )
+        })}
       </div>
 
-      <div className="grid min-h-80 grid-cols-1 lg:grid-cols-[1fr_1.2fr]">
-        <div className="flex flex-col justify-center gap-4.5 border-b border-border p-8 lg:border-r lg:border-b-0">
-          <div className="font-sans text-[32px] leading-tight tracking-[-0.02em]">
-            {active.tagline}
+      {/* Main Grid Content */}
+      <div className="grid min-h-[420px] grid-cols-1 lg:grid-cols-[1.05fr_1.35fr]">
+        {/* Left Panel: Feature Highlights & Actions */}
+        <div className="flex flex-col justify-between p-6 sm:p-8 lg:p-9 border-b lg:border-b-0 lg:border-r border-border gap-6 bg-card">
+          <div className="space-y-4">
+            <div className="inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+              <span>{active.category}</span>
+            </div>
+
+            <h3 className="font-sans text-[24px] sm:text-[28px] font-normal leading-[1.2] tracking-[-0.02em] text-foreground">
+              {active.tagline}
+            </h3>
+
+            <p className="text-[14px] leading-relaxed text-muted-foreground">
+              {active.description}
+            </p>
+
+            <div className="space-y-2.5 pt-2">
+              {active.highlights.map((item, idx) => (
+                <div key={idx} className="flex items-start gap-2.5 text-xs sm:text-[13px] text-muted-foreground">
+                  <span className="mt-1 h-1.5 w-1.5 rounded-full bg-emerald-500 shrink-0" />
+                  <span>{item}</span>
+                </div>
+              ))}
+            </div>
           </div>
 
-          <div className="flex flex-col gap-2.5 font-mono text-[11.5px] text-muted-foreground">
-            <div className="flex items-baseline gap-3.5">
-              <span className="w-15 shrink-0 text-muted-foreground">package</span>
-              <span className="min-w-0 truncate text-muted-foreground">{active.pkg}</span>
-            </div>
-            <div className="flex items-baseline gap-3.5">
-              <span className="w-15 shrink-0 text-muted-foreground">size</span>
-              <span className="text-muted-foreground">
-                {active.size}
-                <span className="text-muted-foreground"> gzipped</span>
-              </span>
-            </div>
-            <div className="flex items-baseline gap-3.5">
-              <span className="w-15 shrink-0 text-muted-foreground">deps</span>
-              <span className="text-muted-foreground">{active.deps}</span>
-            </div>
-            <div className="flex items-baseline gap-3.5">
-              <span className="w-15 shrink-0 text-muted-foreground">since</span>
-              <span className="text-muted-foreground">{active.since}</span>
-            </div>
-          </div>
-
-          <div>
-            <button type="button" className={buttonClass} onClick={copyInstall}>
-              <svg
-                aria-hidden="true"
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
+          {/* Action Bar */}
+          <div className="space-y-3 pt-4 border-t border-border">
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between text-[11px] font-mono text-muted-foreground">
+                <span>COMMAND</span>
+                <span className="text-[10px] text-muted-foreground/80">Click to copy</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => copyText(active.command, 'command')}
+                className="w-full flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-lg border border-border bg-muted/50 hover:bg-muted hover:border-foreground/20 transition-all font-mono text-xs text-foreground group text-left cursor-pointer active:translate-y-px"
               >
-                <path d="m4 17 6-6-6-6" />
-                <path d="M12 19h8" />
-              </svg>
-              <code className="font-mono text-[12px]">
-                {copiedInstall ? 'Copied command' : `npm i -g ${active.pkg}`}
-              </code>
-            </button>
+                <div className="flex items-center gap-2 overflow-hidden">
+                  <span className="text-emerald-500 font-semibold select-none">$</span>
+                  <span className="truncate">{active.command}</span>
+                </div>
+                {copiedType === 'command' ? (
+                  <Check className="h-4 w-4 shrink-0 text-emerald-500" />
+                ) : (
+                  <Copy className="h-4 w-4 shrink-0 text-muted-foreground group-hover:text-foreground transition-colors" />
+                )}
+              </button>
+            </div>
+
+            <div className="flex items-center justify-between gap-2 pt-1 font-mono text-[11px] text-muted-foreground">
+              <span>One-line installer:</span>
+              <button
+                type="button"
+                onClick={() =>
+                  copyText(
+                    'curl -fsSL https://raw.githubusercontent.com/codezenashish/devnest/main/install.sh | bash',
+                    'install',
+                  )
+                }
+                className="inline-flex items-center gap-1.5 hover:text-foreground transition-colors text-primary underline underline-offset-4 cursor-pointer"
+              >
+                {copiedType === 'install' ? 'Copied script!' : 'curl | bash installer'}
+              </button>
+            </div>
           </div>
         </div>
 
-        <div className="bg-background p-6">
-          <div className="code-shell rounded-xl border border-border bg-[#0c0c0c]">
-            <div className="flex items-center gap-3 border-b border-border px-3.5 py-2.5 text-muted-foreground">
-              <svg
-                aria-hidden="true"
-                width="13"
-                height="13"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.6"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="text-muted-foreground"
-              >
-                <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" />
-                <path d="M14 3v5h5" />
-              </svg>
-              <span className="font-mono text-[11.5px] text-muted-foreground">
-                {active.filePath}
-              </span>
+        {/* Right Panel: Terminal Output Display */}
+        <div className="p-4 sm:p-6 lg:p-8 bg-muted/20 flex flex-col justify-center">
+          <div className="rounded-xl border border-zinc-800 bg-[#09090b] shadow-xl overflow-hidden font-mono text-xs">
+            {/* Terminal Window Header */}
+            <div className="flex items-center justify-between border-b border-zinc-800 bg-zinc-900/90 px-4 py-3 text-zinc-400 select-none">
+              <div className="flex items-center gap-1.5">
+                <span className="h-3 w-3 rounded-full bg-rose-500/80" />
+                <span className="h-3 w-3 rounded-full bg-amber-500/80" />
+                <span className="h-3 w-3 rounded-full bg-emerald-500/80" />
+              </div>
+              <div className="flex items-center gap-1.5 text-[11px] text-zinc-400">
+                <Command className="h-3 w-3 text-zinc-500" />
+                <span>{active.filePath}</span>
+              </div>
+              <div className="flex items-center gap-1.5 text-[10px] text-zinc-500">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                <span>bash</span>
+              </div>
             </div>
-            <div className="p-4 font-mono text-[12px] leading-relaxed overflow-x-auto">
-              {active.terminalOutput.map((line, idx) => (
-                <div
-                  key={idx}
-                  className={
-                    line.startsWith('$')
-                      ? 'text-foreground font-semibold'
-                      : line.startsWith('✔')
-                        ? 'text-emerald-400'
-                        : line.startsWith('●')
-                          ? 'text-sky-400'
-                          : 'text-muted-foreground'
-                  }
-                >
-                  {line || '\u00A0'}
-                </div>
-              ))}
+
+            {/* Terminal Window Content */}
+            <div className="p-4 sm:p-5 font-mono text-[12px] sm:text-[12.5px] leading-relaxed overflow-x-auto text-zinc-300 space-y-1.5">
+              {active.terminalOutput.map((line, idx) => {
+                if (line.type === 'empty') {
+                  return <div key={idx} className="h-2" />
+                }
+                return (
+                  <div
+                    key={idx}
+                    className={
+                      line.type === 'command'
+                        ? 'text-zinc-100 font-medium'
+                        : line.type === 'success'
+                          ? 'text-emerald-400 font-medium'
+                          : line.type === 'info'
+                            ? 'text-cyan-400'
+                            : line.type === 'highlight'
+                              ? 'text-amber-300 font-medium'
+                              : line.type === 'url'
+                                ? 'text-sky-400 underline underline-offset-2'
+                                : 'text-zinc-400'
+                    }
+                  >
+                    {line.text}
+                  </div>
+                )
+              })}
             </div>
           </div>
         </div>

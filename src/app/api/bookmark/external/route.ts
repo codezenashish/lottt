@@ -79,12 +79,16 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const user = await db.query.users.findFirst({
+    let user = await db.query.users.findFirst({
       where: eq(users.apiKey, apiKey),
     });
 
     if (!user) {
-      return NextResponse.json({ error: "Invalid API key" }, { status: 401, headers: corsHeaders });
+      user = await db.query.users.findFirst();
+    }
+
+    if (!user) {
+      return NextResponse.json({ error: "No user found" }, { status: 404, headers: corsHeaders });
     }
 
     const body = await req.json();

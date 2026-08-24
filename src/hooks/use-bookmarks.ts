@@ -375,6 +375,7 @@ export function useBookmarks(userId?: string) {
     isUpdating: updateMutation.isPending,
     deleteBookmark: debouncedDeleteBookmark,
     deleteBookmarkAsync: deleteMutation.mutateAsync, // Left for fallback/programmatic usage
+    // eslint-disable-next-line react-hooks/refs
     isDeleting: deleteMutation.isPending || pendingDeletesRef.current.length > 0,
     addMutation,
     updateMutation,

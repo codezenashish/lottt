@@ -22,7 +22,21 @@ export async function PATCH(
 
     const { id } = await params;
     const body = await req.json();
-    const { title, content, language, isSnippet, tags: noteTags, isBookmarked, isPinned, folderId } = body;
+    const {
+      title,
+      content,
+      language,
+      isSnippet,
+      tags: noteTags,
+      isBookmarked,
+      isPinned,
+      folderId,
+      sourceUrl,
+      sourceTitle,
+      selectedText,
+      sourceAnchor,
+      referenceId,
+    } = body;
 
     const existing = await db.query.notes.findFirst({
       where: eq(notes.id, id),
@@ -61,6 +75,13 @@ export async function PATCH(
         ...(isPinned !== undefined && { isPinned: Boolean(isPinned) }),
         ...(folderId !== undefined && { folderId: folderId || null }),
         ...(noteTags !== undefined && { tags: Array.isArray(noteTags) ? noteTags : [] }),
+        ...(sourceUrl !== undefined && { sourceUrl: sourceUrl || null }),
+        ...(sourceTitle !== undefined && { sourceTitle: sourceTitle || null }),
+        ...(selectedText !== undefined && { selectedText: selectedText || null }),
+        ...(sourceAnchor !== undefined && {
+          sourceAnchor: sourceAnchor ? (typeof sourceAnchor === "object" ? JSON.stringify(sourceAnchor) : sourceAnchor) : null,
+        }),
+        ...(referenceId !== undefined && { referenceId: referenceId || null }),
         updatedAt: new Date(),
       })
       .where(eq(notes.id, id))

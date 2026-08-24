@@ -6,26 +6,22 @@ import { useAuth } from "@/providers/auth-provider";
 import { useBookmarkStore } from "@/store/useBookmarkStore";
 import { useBookmarks } from "@/hooks/use-bookmarks";
 import { useBookmarksRealtime } from "@/hooks/use-bookmarks-realtime";
-import { useCategoriesQuery, useDeleteCategoryMutation } from "@/features/bookmarks/hooks/use-bookmark-queries";
+import { useCategoriesQuery } from "@/features/bookmarks/hooks/use-bookmark-queries";
 import { BookmarkGrid } from "@/features/bookmarks/components/bookmark-grid";
-import { CategoryFilter } from "@/features/bookmarks/components/category-filter";
 import { AdvancedFilters } from "@/features/bookmarks/components/advanced-filters";
 import { AddBookmarkModal } from "@/features/bookmarks/dialogs/add-bookmark-modal";
 import { ImportBookmarksModal } from "@/features/bookmarks/dialogs/import-bookmarks-modal";
 import { BookmarkItem, BookmarkCategory } from "@/features/bookmarks/components/bookmark-card";
 import { ShareCategoryDialog } from "@/features/bookmarks/dialogs/share-category-dialog";
 import { BulkActionBar } from "@/features/bookmarks/components/bulk-action-bar";
-import { gooeyToast as toast } from "@/components/ui/goey-toaster";
 import { useSearchStore } from "@/store/useSearchStore";
 import { useDebounce } from "@/hooks/use-debounce";
-import { Plus, LayoutGrid, List, Upload } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function BookmarksPage() {
   const { user } = useAuth();
   const userId = user?.id;
   const queryClient = useQueryClient();
-  const deleteCategoryMutation = useDeleteCategoryMutation(user?.id);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [shareTargetCategory, setShareTargetCategory] = useState<BookmarkCategory | null>(null);
 
@@ -58,11 +54,8 @@ export default function BookmarksPage() {
     selectedBookmarkIds,
     toggleSelection,
     clearSelection,
-    setSelectedCategory,
-    setLayoutMode,
     openAddModal,
     closeAddModal,
-    openImportModal,
     closeImportModal,
   } = useBookmarkStore();
 

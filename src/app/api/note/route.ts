@@ -65,7 +65,21 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { title, content, language, isSnippet, tags: noteTags, isBookmarked, isPinned, folderId } = body;
+    const {
+      title,
+      content,
+      language,
+      isSnippet,
+      tags: noteTags,
+      isBookmarked,
+      isPinned,
+      folderId,
+      sourceUrl,
+      sourceTitle,
+      selectedText,
+      sourceAnchor,
+      referenceId,
+    } = body;
 
     if (!content || typeof content !== "string" || !content.trim()) {
       return NextResponse.json(
@@ -85,6 +99,11 @@ export async function POST(req: NextRequest) {
         isPinned: Boolean(isPinned),
         folderId: folderId || null,
         tags: Array.isArray(noteTags) ? noteTags : [],
+        sourceUrl: sourceUrl || null,
+        sourceTitle: sourceTitle || null,
+        selectedText: selectedText || null,
+        sourceAnchor: sourceAnchor ? (typeof sourceAnchor === "object" ? JSON.stringify(sourceAnchor) : sourceAnchor) : null,
+        referenceId: referenceId || (sourceUrl ? `ref_${crypto.randomUUID()}` : null),
         userId: user.id,
       })
       .returning();

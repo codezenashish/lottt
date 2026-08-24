@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { ArrowLeft, Tag as TagIcon, Trash2, X, Pin, Star } from "lucide-react";
+import { ArrowLeft, Tag as TagIcon, Trash2, X, Pin, Star, Globe, ExternalLink } from "lucide-react";
 import { TipTapEditor } from "./tiptap-editor";
-import { Note } from "./notes-card";
+import { Note, getReferenceUrl } from "./notes-card";
 import { clsx } from "clsx";
 import { useKeyboardShortcuts } from "../hooks/use-keyboard-shortcuts";
 import { gooeyToast as toast } from "@/components/ui/goey-toaster";
@@ -189,6 +189,26 @@ export function NotionEditor({
           )}
         </div>
       </div>
+
+      {note?.sourceUrl && (
+        <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-2.5 rounded-xl bg-card border border-primary/20 text-xs text-muted-foreground shadow-xs">
+          <div className="flex items-center gap-2 min-w-0">
+            <Globe className="w-4 h-4 text-primary shrink-0" />
+            <span className="truncate">
+              Source Webpage: <strong className="text-foreground font-medium">{note.sourceTitle || note.sourceUrl}</strong>
+            </span>
+          </div>
+          <a
+            href={getReferenceUrl(note)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-primary text-primary-foreground font-medium text-xs shadow-xs hover:bg-primary/90 transition-colors shrink-0"
+          >
+            <span>Source → Open selection</span>
+            <ExternalLink className="w-3.5 h-3.5" />
+          </a>
+        </div>
+      )}
 
       <div className="space-y-6 pt-4">
         <div>

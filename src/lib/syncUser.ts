@@ -4,8 +4,29 @@ import { users } from "@/db/schema";
 
 import { cache } from "react";
 import { eq } from "drizzle-orm";
+import { headers } from "next/headers";
 
 export const getOrCreateDbUser = cache(async () => {
+  // Check Authorization header for Bearer API Key (used by Chrome Extension and CLI)
+  try {
+    const reqHeaders = await headers();
+    const authHeader = reqHeaders.get("authorization");
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      const apiKey = authHeader.substring(7).trim();
+      if (apiKey) {
+        const userByApiKey = await db.query.users.findFirst({
+          where: eq(users.apiKey, apiKey),
+        });
+        if (userByApiKey) {
+          return userByApiKey;
+        }
+      }
+    }
+  } catch {
+    // Ignore error if headers() is unavailable in non-request contexts
+  }
+
+  // Fallback to Supabase session authentication
   const supabase = await createServerSupabaseClient();
   const {
     data: { session },
@@ -55,3 +76,4 @@ export const getOrCreateDbUser = cache(async () => {
 
   return dbUser;
 });
+

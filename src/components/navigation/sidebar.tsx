@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { RyukLogo } from "@/components/common/ryuk-logo";
 import { usePathname } from "next/navigation";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { sidebar } from "./side-config";

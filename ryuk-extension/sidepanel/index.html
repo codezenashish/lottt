@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Devnest Bookmark Manager</title>
+  <link rel="stylesheet" href="styles/sidepanel.css">
+</head>
+<body class="bg-background text-foreground">
+  <div class="sidepanel-container">
+
+    <!-- Header -->
+    <header class="sidepanel-header">
+      <div class="header-brand">
+        <div class="logo-badge">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 21l-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+          </svg>
+        </div>
+        <div class="header-title-group">
+          <h1 class="header-title">Devnest</h1>
+          <span class="header-subtitle">Bookmark Manager</span>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <button id="refreshBtn" class="icon-btn" title="Refresh Bookmarks">
+          <svg id="refreshIcon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21.5 2v6h-6M2.13 15.57a10 10 0 0 0 18.25-2.73M2.5 22v-6h6M21.87 8.43a10 10 0 0 0-18.25 2.73"></path>
+          </svg>
+        </button>
+        <button id="toggleSettingsBtn" class="icon-btn" title="Extension Settings">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Bookmarks View Container -->
+    <div id="bookmarksViewContainer" class="view-container">
+
+      <!-- Search Section -->
+      <div class="search-section">
+        <div class="search-input-wrapper">
+          <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" id="searchInput" placeholder="Search bookmarks..." autocomplete="off">
+          <button id="clearSearchBtn" class="clear-btn hidden" title="Clear Search">&times;</button>
+        </div>
+      </div>
+
+      <!-- Action Bar / Toggle Add Form -->
+      <div class="action-bar">
+        <button id="toggleAddBtn" class="primary-btn">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          <span>Add Bookmark</span>
+        </button>
+      </div>
+
+      <!-- Inline Add Bookmark Form -->
+      <div id="addFormCard" class="add-form-card hidden">
+        <div class="form-header">
+          <h3 class="form-title">Save Active Tab</h3>
+          <button id="closeAddFormBtn" class="close-form-btn">&times;</button>
+        </div>
+
+        <div class="tab-preview">
+          <img id="activeFavicon" src="" class="preview-favicon" alt="">
+          <div class="preview-info">
+            <input type="text" id="addTitleInput" class="form-input text-bold" placeholder="Bookmark Title">
+            <span id="activeUrlDisplay" class="preview-url">Detecting active tab...</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Category</label>
+          <div class="category-select-wrapper">
+            <select id="addCategorySelect" class="form-select">
+              <option value="">📁 Uncategorized</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Description (Optional)</label>
+          <textarea id="addDescriptionInput" class="form-textarea" rows="2" placeholder="Brief notes about this link..."></textarea>
+        </div>
+
+        <div class="form-actions">
+          <button id="cancelAddBtn" class="secondary-btn">Cancel</button>
+          <button id="saveBookmarkBtn" class="submit-btn">
+            <svg id="saveBtnSpinner" class="spinner hidden" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"></path>
+            </svg>
+            <span id="saveBtnText">Save Bookmark</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Scrollable Main Content -->
+      <main id="mainContent" class="main-content">
+        <!-- Loading Skeleton View -->
+        <div id="loadingView" class="skeleton-view">
+          <div class="skeleton-category">
+            <div class="skeleton-header"></div>
+            <div class="skeleton-item"></div>
+            <div class="skeleton-item"></div>
+          </div>
+          <div class="skeleton-category">
+            <div class="skeleton-header"></div>
+            <div class="skeleton-item"></div>
+          </div>
+        </div>
+
+        <!-- Categories & Bookmarks Accordion Container -->
+        <div id="accordionContainer" class="accordion-container hidden"></div>
+
+        <!-- Empty State View -->
+        <div id="emptyView" class="empty-state hidden">
+          <div class="empty-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M19 21l-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+            </svg>
+          </div>
+          <h3 id="emptyTitle" class="empty-title">No Bookmarks Found</h3>
+          <p id="emptyDesc" class="empty-desc">Click "+ Add Bookmark" to save your current tab to Devnest.</p>
+          <button id="emptyAddBtn" class="primary-btn"><span>+ Add Bookmark</span></button>
+        </div>
+
+        <!-- Error State View -->
+        <div id="errorView" class="error-state hidden">
+          <div class="error-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#f43f5e" stroke-width="1.5">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+          </div>
+          <h3 id="errorTitle" class="error-title">Connection Error</h3>
+          <p id="errorDesc" class="error-desc">Unable to reach the Devnest server.</p>
+          <div class="error-actions">
+            <button id="errorRetryBtn" class="secondary-btn">Retry</button>
+            <button id="errorOpenSettingsBtn" class="primary-btn"><span>Settings</span></button>
+          </div>
+        </div>
+
+        <!-- Unauthenticated View -->
+        <div id="unauthView" class="unauth-state hidden">
+          <div class="unauth-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="1.5">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+          </div>
+          <h3 class="unauth-title">Authentication Required</h3>
+          <p class="unauth-desc">Connect your Devnest API key to access and sync bookmarks.</p>
+          <button id="connectKeyBtn" class="primary-btn full-width"><span>Configure API Key</span></button>
+        </div>
+      </main>
+
+    </div>
+
+    <!-- Inline Extension Settings View Container -->
+    <div id="settingsViewContainer" class="view-container hidden">
+      <div class="settings-header">
+        <button id="backFromSettingsBtn" class="icon-btn-text">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+          <span>Back to Bookmarks</span>
+        </button>
+      </div>
+
+      <div class="settings-card">
+        <div class="settings-card-title">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path>
+          </svg>
+          <span>API Credentials</span>
+        </div>
+
+        <form id="sidepanelSettingsForm" class="space-y-4">
+          <div class="form-group">
+            <label class="form-label" for="settingsServerUrl">
+              Server URL
+              <span class="badge-tag">Required</span>
+            </label>
+            <input type="url" id="settingsServerUrl" class="form-input" placeholder="http://localhost:3000" required spellcheck="false" autocomplete="off">
+            <span class="form-hint">Your Devnest web app URL (default: http://localhost:3000)</span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="settingsApiKey">
+              API Key
+              <span class="badge-tag">Bearer Key</span>
+            </label>
+            <div class="input-toggle-wrapper">
+              <input type="password" id="settingsApiKey" class="form-input" placeholder="ryuk_sk_..." required spellcheck="false" autocomplete="off">
+              <button type="button" id="toggleApiKeyVisibility" class="toggle-text-btn">Show</button>
+            </div>
+            <span class="form-hint">Copy API key from Devnest Web App ➔ Settings (<code>/setting</code>).</span>
+          </div>
+
+          <div class="settings-form-actions">
+            <button type="submit" id="saveSettingsBtn" class="primary-btn full-width">
+              <span>Save Settings</span>
+            </button>
+            <button type="button" id="testServerBtn" class="secondary-btn full-width">
+              <span>Test Connection</span>
+            </button>
+          </div>
+        </form>
+
+        <div id="settingsStatusMsg" class="status-box hidden"></div>
+      </div>
+    </div>
+
+    <!-- Toast Banner -->
+    <div id="sidepanelToast" class="toast-banner hidden"></div>
+  </div>
+
+  <script type="module" src="pages/sidepanel.js"></script>
+</body>
+</html>

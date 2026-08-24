@@ -174,6 +174,11 @@ export const notes = pgTable(
     isPinned: boolean("isPinned").default(false).notNull(),
     folderId: text("folderId").references(() => folders.id, { onDelete: "set null" }),
     tags: text("tags").array().default([]).notNull(),
+    sourceUrl: text("sourceUrl"),
+    sourceTitle: text("sourceTitle"),
+    selectedText: text("selectedText"),
+    sourceAnchor: text("sourceAnchor"),
+    referenceId: text("referenceId"),
     userId: text("userId")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
