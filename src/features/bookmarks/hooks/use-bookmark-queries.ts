@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { gooeyToast as toast } from "@/components/ui/goey-toaster";
+import { toast } from "sonner";
 import {
   BookmarkItem,
   BookmarkCategory,

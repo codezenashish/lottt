@@ -6,7 +6,7 @@ import { TipTapEditor } from "./tiptap-editor";
 import { Note, getReferenceUrl } from "./notes-card";
 import { clsx } from "clsx";
 import { useKeyboardShortcuts } from "../hooks/use-keyboard-shortcuts";
-import { gooeyToast as toast } from "@/components/ui/goey-toaster";
+import { toast } from "sonner";
 
 interface NotionEditorProps {
   note: Note | null;

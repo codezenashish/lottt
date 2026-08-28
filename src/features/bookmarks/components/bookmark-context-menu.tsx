@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Copy, ExternalLink, Share, Edit2, Trash2 } from "lucide-react";
 import { BookmarkItem } from "./bookmark-card";
-import { gooeyToast as toast } from "@/components/ui/goey-toaster";
+import { toast } from "sonner";
 
 interface BookmarkContextMenuProps {
   children: React.ReactNode;

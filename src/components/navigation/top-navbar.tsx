@@ -6,13 +6,12 @@ import { useUser } from "@/providers/auth-provider";
 import { UserAvatar } from "@/components/common/user-avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SearchBar } from "@/components/common/search-bar";
-import { NotificationBall } from "@/components/common/notification-ball";
+
 import { ModeToggle } from "@/components/ui/theme-toggle";
 import { RyukLogo } from "@/components/common/ryuk-logo";
 import { useSearchStore } from "@/store/useSearchStore";
 import { useEffect } from "react";
-import { HugeiconsIcon } from "@hugeicons/react";
-import { Github } from "@hugeicons/core-free-icons";
+
 
 export function TopNavbar() {
   const pathname = usePathname();
@@ -52,23 +51,11 @@ export function TopNavbar() {
 
       {/* Right: Global Actions & User Profile */}
       <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-        <a
-          href="https://github.com/codezenashish/ryuk"
-          target="_blank"
-          rel="noreferrer"
-          className="hidden md:inline-flex items-center gap-1.5 rounded-lg border border-border bg-muted px-2.5 py-1 font-mono text-xs text-muted-foreground hover:border-foreground/20 hover:text-foreground hover:bg-card transition"
-          title="GitHub Repository"
-        >
-          <HugeiconsIcon size={14} icon={Github} />
-          <span className="font-medium text-foreground">GitHub</span>
-          <span className="rounded-md bg-background px-1.5 py-0.5 text-[10px] text-muted-foreground border border-border">
-            v1.0
-          </span>
-        </a>
+        
 
         <ModeToggle />
 
-        <NotificationBall />
+        
 
         {!isLoaded ? (
           <Skeleton className="h-8 w-8 rounded-full bg-muted border border-border" />

@@ -3,7 +3,7 @@ import { Geist, Geist_Mono, Newsreader } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/providers/auth-provider";
 import QueryProvider from "@/providers/query-provider";
-import { GooeyToaster } from "@/components/ui/goey-toaster";
+import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { CommandMenu } from "@/components/common/command-menu";
 
@@ -46,7 +46,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             >
               {children}
               <CommandMenu />
-              <GooeyToaster position="bottom-right" />
+              <Toaster position="bottom-right" />
             </ThemeProvider>
           </QueryProvider>
         </AuthProvider>

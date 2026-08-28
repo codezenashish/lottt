@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Folder as FolderIcon, Plus, Trash2 } from "lucide-react";
 import { useFolders } from "../hooks/use-folders";
 import { clsx } from "clsx";
-import { gooeyToast as toast } from "@/components/ui/goey-toaster";
+import { toast } from "sonner";
 
 interface FolderSidebarProps {
   activeFolderId: string | null;
