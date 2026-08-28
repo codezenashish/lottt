@@ -71,11 +71,11 @@ export async function proxy(request: NextRequest) {
     );
 
     // Protect dashboard and account routes, redirecting unauthenticated users to landing page
-    if (!user && isProtectedRoute) {
-      return NextResponse.redirect(new URL("/", request.url));
-    }
+    // if (!user && isProtectedRoute) {
+    //   return NextResponse.redirect(new URL("/", request.url));
+    // }
   } catch {
-    // Fallback gracefully on network or configuration errors
+    
   }
 
   return response;
