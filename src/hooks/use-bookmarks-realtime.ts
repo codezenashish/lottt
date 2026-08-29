@@ -31,7 +31,7 @@ export function useBookmarksRealtime(userId?: string) {
           table: "bookmark",
           filter: `userId=eq.${userId}`,
         },
-        (payload) => {
+        (payload: { eventType: string; [key: string]: unknown }) => {
           console.log(
             `[Supabase Realtime] DB event '${payload.eventType}' detected on bookmark table:`,
             payload
@@ -50,8 +50,8 @@ export function useBookmarksRealtime(userId?: string) {
           if (activeMutations === 0 && pendingDeletes.length === 0) {
             queryClient.invalidateQueries({
               queryKey: getBookmarksQueryKey(userId),
+              exact: true,
             });
-            queryClient.invalidateQueries({ queryKey: ["bookmarks"] });
           }
 
           // Add real-time sync notification item
@@ -69,7 +69,7 @@ export function useBookmarksRealtime(userId?: string) {
           });
         }
       )
-      .subscribe((status) => {
+      .subscribe((status: string) => {
         if (status === "SUBSCRIBED") {
           console.log(
             `[Supabase Realtime] Successfully subscribed to bookmark changes for userId: ${userId}`

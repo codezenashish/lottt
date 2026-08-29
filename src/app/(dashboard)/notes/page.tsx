@@ -7,10 +7,12 @@ import { Note } from "@/features/notes/components/notes-card";
 import { useNotes } from "@/features/notes/hooks/use-notes";
 import { FolderSidebar } from "@/features/notes/components/folder-sidebar";
 import { useKeyboardShortcuts } from "@/features/notes/hooks/use-keyboard-shortcuts";
+import { ShareNoteDialog } from "@/features/notes/dialogs/share-note-dialog";
 
 export default function NotesPage() {
   const [activeNote, setActiveNote] = useState<Note | "new" | null>(null);
   const [activeFolderId, setActiveFolderId] = useState<string | null>(null);
+  const [sharingNote, setSharingNote] = useState<Note | null>(null);
   const { notes, isLoading, isError, error, saveNote, deleteNote, togglePin, toggleBookmark } = useNotes();
 
   useEffect(() => {
@@ -89,11 +91,20 @@ export default function NotesPage() {
             isLoading={isLoading}
             onSelectNote={(note) => setActiveNote(note)}
             onDeleteNote={handleDeleteNote}
+            onShareNote={(note) => setSharingNote(note)}
             onTogglePin={togglePin}
             onToggleBookmark={toggleBookmark}
           />
         )}
       </div>
+
+      {sharingNote && (
+        <ShareNoteDialog
+          isOpen={Boolean(sharingNote)}
+          onClose={() => setSharingNote(null)}
+          note={sharingNote}
+        />
+      )}
     </div>
   );
 }

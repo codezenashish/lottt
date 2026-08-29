@@ -95,7 +95,7 @@ export function BookmarkHeader() {
   };
 
   return (
-    <div className="space-y-3 pb-2">
+    <div className="flex flex-col gap-3 md:gap-4">
       <div ref={searchContainerRef} id="in-page-search-bar" className="relative w-full">
         <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
         <input
@@ -103,11 +103,11 @@ export function BookmarkHeader() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search bookmarks or tags..."
-          className="w-full rounded-xl bg-card border border-border pl-10 pr-4 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 transition-all shadow-2xs"
+          className="w-full rounded-xl bg-card border border-border pl-10 pr-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 transition-all shadow-2xs"
         />
       </div>
 
-      <div className="flex items-center gap-2 overflow-x-auto scrollbar-none [scrollbar-width:none] [&::-webkit-scrollbar]:hidden py-0.5 select-none">
+      <div className="flex items-center gap-2 overflow-x-auto scrollbar-none [scrollbar-width:none] [&::-webkit-scrollbar]:hidden py-1 select-none">
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.97 }}

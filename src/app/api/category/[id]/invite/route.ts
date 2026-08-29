@@ -22,7 +22,7 @@ export async function POST(
 
     const { id } = await params;
     const body = await req.json();
-    const { email } = body;
+    const { email, role } = body;
 
     if (!email || typeof email !== "string") {
       return NextResponse.json(
@@ -30,6 +30,8 @@ export async function POST(
         { status: 400 }
       );
     }
+
+    const assignedRole = role === "EDITOR" ? "EDITOR" : "VIEWER";
 
     // Ensure the current user owns this category
     const category = await db.query.categories.findFirst({
@@ -84,6 +86,7 @@ export async function POST(
         categoryId: id,
         userId: targetUser.id,
         invitedBy: user.id,
+        role: assignedRole,
       })
       .returning();
 

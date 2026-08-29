@@ -9,12 +9,22 @@ const supabaseUrl =
 const supabaseAnonKey =
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "placeholder-anon-key";
 
+let clientInstance: ReturnType<typeof createBrowserClient> | undefined;
+
 export function createClient() {
-  return createBrowserClient(supabaseUrl, supabaseAnonKey, {
-    auth: {
-      persistSession: true,
-      autoRefreshToken: true,
-      detectSessionInUrl: true,
-    },
-  });
+  if (typeof window === "undefined") {
+    return createBrowserClient(supabaseUrl, supabaseAnonKey);
+  }
+
+  if (!clientInstance) {
+    clientInstance = createBrowserClient(supabaseUrl, supabaseAnonKey, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true,
+      },
+    });
+  }
+
+  return clientInstance;
 }

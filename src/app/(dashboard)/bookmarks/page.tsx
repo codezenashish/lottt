@@ -181,12 +181,12 @@ export default function BookmarksPage() {
 
   if (isLoadingBookmarks && bookmarks.length === 0) {
     return (
-      <div className="py-6 space-y-6">
+      <div className="pt-4 md:pt-6 pb-6 flex flex-col gap-4 md:gap-5">
         <div className="flex justify-between items-center">
           <Skeleton className="h-8 w-48 bg-muted rounded-lg" />
           <Skeleton className="h-9 w-32 bg-muted rounded-xl" />
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5">
           <Skeleton className="h-40 w-full bg-muted rounded-xl" />
           <Skeleton className="h-40 w-full bg-muted rounded-xl" />
           <Skeleton className="h-40 w-full bg-muted rounded-xl" />
@@ -196,7 +196,7 @@ export default function BookmarksPage() {
   }
 
   return (
-    <div className="py-6 space-y-6">
+    <div className="pt-4 md:pt-6 pb-6 flex flex-col gap-4 md:gap-5">
       {/* Modal */}
       <AddBookmarkModal
         isOpen={isAddModalOpen}
@@ -227,8 +227,6 @@ export default function BookmarksPage() {
           }}
         />
       )}
-
-
 
       <BookmarkHeader />
 

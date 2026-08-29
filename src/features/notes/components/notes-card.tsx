@@ -13,6 +13,7 @@ import {
   Star,
   ExternalLink,
   Globe,
+  Share2,
 } from "lucide-react";
 import { clsx } from "clsx";
 
@@ -25,6 +26,8 @@ export interface Note {
   tags?: string[];
   isPinned?: boolean;
   isBookmarked?: boolean;
+  isShared?: boolean;
+  shareToken?: string | null;
   folderId?: string | null;
   sourceUrl?: string | null;
   sourceTitle?: string | null;
@@ -77,6 +80,7 @@ interface NotesCardProps {
   note: Note;
   onEdit: (note: Note) => void;
   onDelete: (id: string) => void;
+  onShare?: (note: Note) => void;
   onTagClick?: (tag: string) => void;
   onTogglePin?: (id: string, isPinned: boolean) => void;
   onToggleBookmark?: (id: string, isBookmarked: boolean) => void;
@@ -87,6 +91,7 @@ export function NotesCard({
   note,
   onEdit,
   onDelete,
+  onShare,
   onTagClick,
   onTogglePin,
   onToggleBookmark,
@@ -177,6 +182,19 @@ export function NotesCard({
             {formattedDate}
           </span>
           <div className="flex items-center gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
+            {onShare && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onShare(note);
+                }}
+                className="p-1 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                title="Share Note"
+              >
+                <Share2 className="w-3.5 h-3.5" />
+              </button>
+            )}
             <button
               type="button"
               onClick={(e) => {
@@ -270,6 +288,19 @@ export function NotesCard({
           </div>
 
           <div className="flex items-center gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
+            {onShare && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onShare(note);
+                }}
+                className="p-1 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                title="Share Note"
+              >
+                <Share2 className="w-3.5 h-3.5" />
+              </button>
+            )}
             <button
               type="button"
               onClick={(e) => {

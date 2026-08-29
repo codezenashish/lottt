@@ -142,10 +142,7 @@ export function useCreateBookmarkMutation(userId?: string) {
       );
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey });
-      if (userId) {
-        queryClient.invalidateQueries({ queryKey: ["bookmarks"] });
-      }
+      queryClient.invalidateQueries({ queryKey, exact: true });
     },
   });
 }
@@ -216,10 +213,7 @@ export function useUpdateBookmarkMutation(userId?: string) {
       );
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey });
-      if (userId) {
-        queryClient.invalidateQueries({ queryKey: ["bookmarks"] });
-      }
+      queryClient.invalidateQueries({ queryKey, exact: true });
     },
   });
 }
@@ -257,10 +251,7 @@ export function useDeleteBookmarkMutation(userId?: string) {
       );
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey });
-      if (userId) {
-        queryClient.invalidateQueries({ queryKey: ["bookmarks"] });
-      }
+      queryClient.invalidateQueries({ queryKey, exact: true });
     },
   });
 }
@@ -324,8 +315,7 @@ export function useDeleteCategoryMutation(userId?: string) {
     onSettled: (_data, _error, _variables, context) => {
       queryClient.invalidateQueries({ queryKey: ["categories"] });
       if (context?.bookmarksKey) {
-        queryClient.invalidateQueries({ queryKey: context.bookmarksKey });
-        queryClient.invalidateQueries({ queryKey: ["bookmarks"] });
+        queryClient.invalidateQueries({ queryKey: context.bookmarksKey, exact: true });
       }
     }
   });

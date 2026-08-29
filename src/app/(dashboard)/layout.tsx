@@ -18,7 +18,7 @@ export default function DashboardLayout({
           <Sidebar />
         </aside>
 
-        <main className="min-w-0 overflow-y-auto scrollbar-none [scrollbar-width:none] [&::-webkit-scrollbar]:hidden w-full pb-24 lg:pb-0 px-4 md:px-6 py-4">
+        <main className="min-w-0 overflow-y-auto scrollbar-none [scrollbar-width:none] [&::-webkit-scrollbar]:hidden w-full pb-24 lg:pb-8 px-4 md:px-6">
           {children}
         </main>
       </div>

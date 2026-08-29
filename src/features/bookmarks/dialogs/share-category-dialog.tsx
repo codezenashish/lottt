@@ -4,7 +4,7 @@ import { useState } from "react";
 import { createPortal } from "react-dom";
 import { X, Share2, Copy, Check, Globe, Link as LinkIcon, Loader2, Users, UserPlus, Trash2 } from "lucide-react";
 import { BookmarkCategory } from "../components/bookmark-card";
-import { useCollaboratorsQuery, useInviteCollaboratorMutation, useRemoveCollaboratorMutation } from "../hooks/use-category-collaborators";
+import { useCollaboratorsQuery, useInviteCollaboratorMutation, useRemoveCollaboratorMutation, useUpdateCollaboratorRoleMutation } from "../hooks/use-category-collaborators";
 
 interface ShareCategoryDialogProps {
   isOpen: boolean;
@@ -25,10 +25,12 @@ export function ShareCategoryDialog({
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [inviteEmail, setInviteEmail] = useState("");
+  const [inviteRole, setInviteRole] = useState<"VIEWER" | "EDITOR">("VIEWER");
 
   const { data: collaborators, isLoading: isLoadingCollaborators } = useCollaboratorsQuery(category.id, isOpen);
   const inviteMutation = useInviteCollaboratorMutation(category.id);
   const removeMutation = useRemoveCollaboratorMutation(category.id);
+  const updateRoleMutation = useUpdateCollaboratorRoleMutation(category.id);
 
   if (!isOpen) return null;
 
@@ -81,7 +83,7 @@ export function ShareCategoryDialog({
     e.preventDefault();
     if (!inviteEmail.trim()) return;
     try {
-      await inviteMutation.mutateAsync(inviteEmail);
+      await inviteMutation.mutateAsync({ email: inviteEmail.trim(), role: inviteRole });
       setInviteEmail("");
     } catch {
       // Error is handled by toast in hook
@@ -127,7 +129,7 @@ export function ShareCategoryDialog({
           <div className="flex items-center justify-between p-4 rounded-2xl bg-background border border-border">
             <div className="flex flex-col">
               <span className="text-sm font-semibold text-foreground flex items-center gap-2">
-                <Globe className="w-4 h-4 text-emerald-mark" />
+                <Globe className="w-4 h-4 text-emerald-400" />
                 Public Access
               </span>
               <span className="text-xs text-muted-foreground mt-1 max-w-[200px]">
@@ -187,11 +189,11 @@ export function ShareCategoryDialog({
                 Collaborators
               </span>
               <span className="text-xs text-muted-foreground mt-1">
-                Invite friends to view this category in their dashboard.
+                Invite friends with granular access permissions.
               </span>
             </div>
 
-            <form onSubmit={handleInvite} className="flex gap-2">
+            <form onSubmit={handleInvite} className="flex flex-col gap-2 sm:flex-row">
               <input
                 type="email"
                 placeholder="friend@example.com"
@@ -199,14 +201,24 @@ export function ShareCategoryDialog({
                 onChange={(e) => setInviteEmail(e.target.value)}
                 className="flex-1 px-4 py-2.5 rounded-xl bg-background border border-border text-muted-foreground text-sm focus:outline-none focus:border-indigo-500 transition"
               />
-              <button
-                type="submit"
-                disabled={inviteMutation.isPending || !inviteEmail.trim()}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-500 text-white font-semibold text-xs hover:bg-indigo-600 transition disabled:opacity-50 cursor-pointer"
-              >
-                {inviteMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <UserPlus className="w-4 h-4" />}
-                Invite
-              </button>
+              <div className="flex gap-2">
+                <select
+                  value={inviteRole}
+                  onChange={(e) => setInviteRole(e.target.value as "VIEWER" | "EDITOR")}
+                  className="px-3 py-2.5 rounded-xl bg-background border border-border text-xs text-foreground focus:outline-none"
+                >
+                  <option value="VIEWER">Viewer</option>
+                  <option value="EDITOR">Editor</option>
+                </select>
+                <button
+                  type="submit"
+                  disabled={inviteMutation.isPending || !inviteEmail.trim()}
+                  className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-indigo-500 text-white font-semibold text-xs hover:bg-indigo-600 transition disabled:opacity-50 cursor-pointer shrink-0"
+                >
+                  {inviteMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <UserPlus className="w-4 h-4" />}
+                  Invite
+                </button>
+              </div>
             </form>
 
             {isLoadingCollaborators ? (
@@ -214,21 +226,32 @@ export function ShareCategoryDialog({
             ) : collaborators && collaborators.length > 0 ? (
               <div className="space-y-2 mt-4">
                 <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider font-mono">People with access</span>
-                <div className="max-h-[150px] overflow-y-auto space-y-2 pr-2">
+                <div className="max-h-[160px] overflow-y-auto space-y-2 pr-2">
                   {collaborators.map((collab) => (
-                    <div key={collab.id} className="flex items-center justify-between p-2 rounded-xl bg-card border border-border">
-                      <div className="flex flex-col">
-                        <span className="text-sm font-medium text-foreground">{collab.user.name || "User"}</span>
-                        <span className="text-xs text-muted-foreground">{collab.user.email}</span>
+                    <div key={collab.id} className="flex items-center justify-between p-2.5 rounded-xl bg-card border border-border">
+                      <div className="flex flex-col min-w-0 pr-2">
+                        <span className="text-sm font-medium text-foreground truncate">{collab.user.name || "User"}</span>
+                        <span className="text-xs text-muted-foreground truncate">{collab.user.email}</span>
                       </div>
-                      <button
-                        type="button"
-                        onClick={() => removeMutation.mutate(collab.user.id)}
-                        disabled={removeMutation.isPending}
-                        className="p-1.5 rounded-lg text-rose-400 hover:bg-rose-500/10 transition cursor-pointer"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <select
+                          value={collab.role || "VIEWER"}
+                          onChange={(e) => updateRoleMutation.mutate({ userId: collab.user.id, role: e.target.value as "VIEWER" | "EDITOR" })}
+                          className="px-2 py-1 rounded-lg bg-muted text-[11px] font-medium border border-border text-foreground focus:outline-none"
+                        >
+                          <option value="VIEWER">Viewer</option>
+                          <option value="EDITOR">Editor</option>
+                        </select>
+                        <button
+                          type="button"
+                          onClick={() => removeMutation.mutate(collab.user.id)}
+                          disabled={removeMutation.isPending}
+                          className="p-1.5 rounded-lg text-rose-400 hover:bg-rose-500/10 transition cursor-pointer"
+                          title="Remove access"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>

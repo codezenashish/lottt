@@ -24,7 +24,7 @@ export function BulkActionBar({
   if (selectedCount === 0) return null;
 
   return (
-    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 animate-in slide-in-from-bottom-10 fade-in duration-300">
+    <div className="fixed bottom-20 lg:bottom-6 left-1/2 -translate-x-1/2 z-50 animate-in slide-in-from-bottom-10 fade-in duration-300">
       <div className="flex items-center gap-2 rounded-full border border-foreground/20 bg-card shadow-xl p-1.5 px-3">
         <div className="flex items-center gap-2 px-2 border-r border-border">
           <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">

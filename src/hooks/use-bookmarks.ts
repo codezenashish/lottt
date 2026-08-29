@@ -41,6 +41,9 @@ export function useBookmarks(userId?: string) {
     },
     staleTime: 1000 * 60 * 5, // 5 Minutes fresh cache
     gcTime: 1000 * 60 * 30, // 30 Minutes garbage collection
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
   });
 
   // ----------------------------------------------------
@@ -91,10 +94,7 @@ export function useBookmarks(userId?: string) {
     },
     onSettled: () => {
       if (queryClient.isMutating({ mutationKey: ["addBookmark"] }) <= 1) {
-        queryClient.invalidateQueries({ queryKey });
-        if (userId) {
-          queryClient.invalidateQueries({ queryKey: ["bookmarks"] });
-        }
+        queryClient.invalidateQueries({ queryKey, exact: true });
       }
     },
   });
@@ -155,10 +155,7 @@ export function useBookmarks(userId?: string) {
     },
     onSettled: () => {
       if (queryClient.isMutating({ mutationKey: ["updateBookmark"] }) <= 1) {
-        queryClient.invalidateQueries({ queryKey });
-        if (userId) {
-          queryClient.invalidateQueries({ queryKey: ["bookmarks"] });
-        }
+        queryClient.invalidateQueries({ queryKey, exact: true });
       }
     },
   });
@@ -197,10 +194,7 @@ export function useBookmarks(userId?: string) {
     },
     onSettled: () => {
       if (queryClient.isMutating({ mutationKey: ["deleteBookmark"] }) <= 1) {
-        queryClient.invalidateQueries({ queryKey });
-        if (userId) {
-          queryClient.invalidateQueries({ queryKey: ["bookmarks"] });
-        }
+        queryClient.invalidateQueries({ queryKey, exact: true });
       }
     },
   });
@@ -235,10 +229,7 @@ export function useBookmarks(userId?: string) {
     },
     onSettled: () => {
       if (queryClient.isMutating({ mutationKey: ["bulkDeleteBookmarks"] }) <= 1) {
-        queryClient.invalidateQueries({ queryKey });
-        if (userId) {
-          queryClient.invalidateQueries({ queryKey: ["bookmarks"] });
-        }
+        queryClient.invalidateQueries({ queryKey, exact: true });
       }
     },
   });
@@ -283,10 +274,7 @@ export function useBookmarks(userId?: string) {
     },
     onSettled: () => {
       if (queryClient.isMutating({ mutationKey: ["bulkUpdateBookmarks"] }) <= 1) {
-        queryClient.invalidateQueries({ queryKey });
-        if (userId) {
-          queryClient.invalidateQueries({ queryKey: ["bookmarks"] });
-        }
+        queryClient.invalidateQueries({ queryKey, exact: true });
       }
     },
   });
@@ -343,8 +331,7 @@ export function useBookmarks(userId?: string) {
         // Invalidate if no other deletions are running
         if (queryClient.isMutating({ mutationKey: ["deleteBookmark"] }) === 0 && 
             queryClient.isMutating({ mutationKey: ["bulkDeleteBookmarks"] }) === 0) {
-          queryClient.invalidateQueries({ queryKey });
-          if (userId) queryClient.invalidateQueries({ queryKey: ["bookmarks"] });
+          queryClient.invalidateQueries({ queryKey, exact: true });
         }
       } catch (error) {
         console.error("Delete bookmark failed:", error);
@@ -360,7 +347,7 @@ export function useBookmarks(userId?: string) {
         toast.error(`Failed to delete bookmarks: ${errorMessage}. Restored state.`);
       }
     }, 700);
-  }, [queryClient, queryKey, userId]);
+  }, [queryClient, queryKey]);
 
   return {
     bookmarks: query.data ?? EMPTY_BOOKMARKS,

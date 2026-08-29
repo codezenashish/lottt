@@ -71,6 +71,7 @@ export const categoryCollaborators = pgTable(
       .references(() => users.id, { onDelete: "cascade" }),
     invitedBy: text("invitedBy")
       .references(() => users.id, { onDelete: "cascade" }),
+    role: text("role").default("VIEWER").notNull(), // 'VIEWER' | 'EDITOR'
     createdAt: timestamp("createdAt", { mode: "date" }).defaultNow().notNull(),
   },
   (table) => [
@@ -172,6 +173,8 @@ export const notes = pgTable(
     isSnippet: boolean("isSnippet").default(false).notNull(),
     isBookmarked: boolean("isBookmarked").default(false).notNull(),
     isPinned: boolean("isPinned").default(false).notNull(),
+    isShared: boolean("isShared").default(false).notNull(),
+    shareToken: text("shareToken").unique(),
     folderId: text("folderId").references(() => folders.id, { onDelete: "set null" }),
     tags: text("tags").array().default([]).notNull(),
     sourceUrl: text("sourceUrl"),
@@ -190,7 +193,34 @@ export const notes = pgTable(
   },
   (table) => [
     index("note_user_id_idx").on(table.userId),
-    index("note_user_pinned_bookmark_folder_idx").on(table.userId, table.isPinned, table.isBookmarked, table.folderId)
+    index("note_user_pinned_bookmark_folder_idx").on(table.userId, table.isPinned, table.isBookmarked, table.folderId),
+    index("note_share_token_idx").on(table.shareToken),
+  ]
+);
+
+// ==========================================
+// NOTE COLLABORATORS TABLE
+// ==========================================
+export const noteCollaborators = pgTable(
+  "note_collaborator",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    noteId: text("noteId")
+      .notNull()
+      .references(() => notes.id, { onDelete: "cascade" }),
+    userId: text("userId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    invitedBy: text("invitedBy")
+      .references(() => users.id, { onDelete: "cascade" }),
+    role: text("role").default("VIEWER").notNull(), // 'VIEWER' | 'EDITOR'
+    createdAt: timestamp("createdAt", { mode: "date" }).defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("note_collaborator_unique_idx").on(table.noteId, table.userId),
+    index("note_collaborator_user_id_idx").on(table.userId),
   ]
 );
 
@@ -228,6 +258,7 @@ export const usersRelations = relations(users, ({ many }) => ({
   bookmarks: many(bookmarks),
   categories: many(categories),
   categoryCollaborations: many(categoryCollaborators),
+  noteCollaborations: many(noteCollaborators),
   tags: many(tags),
   notes: many(notes),
   folders: many(folders),
@@ -285,6 +316,22 @@ export const notesRelations = relations(notes, ({ one, many }) => ({
     references: [folders.id],
   }),
   versions: many(noteVersions),
+  collaborators: many(noteCollaborators),
+}));
+
+export const noteCollaboratorsRelations = relations(noteCollaborators, ({ one }) => ({
+  note: one(notes, {
+    fields: [noteCollaborators.noteId],
+    references: [notes.id],
+  }),
+  user: one(users, {
+    fields: [noteCollaborators.userId],
+    references: [users.id],
+  }),
+  inviter: one(users, {
+    fields: [noteCollaborators.invitedBy],
+    references: [users.id],
+  }),
 }));
 
 export const noteVersionsRelations = relations(noteVersions, ({ one }) => ({

@@ -17,6 +17,7 @@ interface NotesGridProps {
   isLoading?: boolean;
   onSelectNote: (note: Note | "new") => void;
   onDeleteNote: (id: string) => Promise<void>;
+  onShareNote?: (note: Note) => void;
   onTogglePin?: (id: string, isPinned: boolean) => Promise<Note>;
   onToggleBookmark?: (id: string, isBookmarked: boolean) => Promise<Note>;
 }
@@ -26,6 +27,7 @@ export function NotesGrid({
   isLoading = false,
   onSelectNote,
   onDeleteNote,
+  onShareNote,
   onTogglePin,
   onToggleBookmark,
 }: NotesGridProps) {
@@ -183,6 +185,7 @@ export function NotesGrid({
               note={note}
               onEdit={() => onSelectNote(note)}
               onDelete={onDeleteNote}
+              onShare={onShareNote}
               onTagClick={(tag) => setSelectedTag(tag)}
               onTogglePin={onTogglePin}
               onToggleBookmark={onToggleBookmark}
@@ -198,6 +201,7 @@ export function NotesGrid({
               note={note}
               onEdit={() => onSelectNote(note)}
               onDelete={onDeleteNote}
+              onShare={onShareNote}
               onTagClick={(tag) => setSelectedTag(tag)}
               onTogglePin={onTogglePin}
               onToggleBookmark={onToggleBookmark}

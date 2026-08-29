@@ -3,6 +3,7 @@ import { toast } from "sonner";
 
 export interface Collaborator {
   id: string;
+  role?: "VIEWER" | "EDITOR";
   user: {
     id: string;
     name: string | null;
@@ -30,11 +31,11 @@ export function useInviteCollaboratorMutation(categoryId: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (email: string) => {
+    mutationFn: async ({ email, role }: { email: string; role?: "VIEWER" | "EDITOR" }) => {
       const res = await fetch(`/api/category/${categoryId}/invite`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, role: role || "VIEWER" }),
       });
       if (!res.ok) {
         const errorData = await res.json();
@@ -42,7 +43,7 @@ export function useInviteCollaboratorMutation(categoryId: string) {
       }
       return res.json();
     },
-    onMutate: async (email: string) => {
+    onMutate: async ({ email, role }) => {
       await queryClient.cancelQueries({ queryKey: ["collaborators", categoryId] });
 
       const previousCollaborators = queryClient.getQueryData<Collaborator[]>(["collaborators", categoryId]) || [];
@@ -50,6 +51,7 @@ export function useInviteCollaboratorMutation(categoryId: string) {
       // Optimistically add placeholder
       const optimisticCollaborator: Collaborator = {
         id: `temp-${Date.now()}`,
+        role: role || "VIEWER",
         user: {
           id: `temp-user-${Date.now()}`,
           name: "Sending invite...",
@@ -68,11 +70,55 @@ export function useInviteCollaboratorMutation(categoryId: string) {
     onSuccess: () => {
       toast.success("Collaborator invited successfully!");
     },
-    onError: (error: Error, _email, context) => {
+    onError: (error: Error, _vars, context) => {
       if (context?.previousCollaborators) {
         queryClient.setQueryData(["collaborators", categoryId], context.previousCollaborators);
       }
       toast.error(error.message || "Failed to invite collaborator");
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["collaborators", categoryId] });
+    },
+  });
+}
+
+export function useUpdateCollaboratorRoleMutation(categoryId: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ userId, role }: { userId: string; role: "VIEWER" | "EDITOR" }) => {
+      const res = await fetch(`/api/category/${categoryId}/collaborators/${userId}/role`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ role }),
+      });
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || "Failed to update role");
+      }
+      return res.json();
+    },
+    onMutate: async ({ userId, role }) => {
+      await queryClient.cancelQueries({ queryKey: ["collaborators", categoryId] });
+
+      const previousCollaborators = queryClient.getQueryData<Collaborator[]>(["collaborators", categoryId]) || [];
+
+      queryClient.setQueryData<Collaborator[]>(["collaborators", categoryId], (old = []) =>
+        old.map((collab) =>
+          collab.user.id === userId ? { ...collab, role } : collab
+        )
+      );
+
+      return { previousCollaborators };
+    },
+    onSuccess: () => {
+      toast.success("Collaborator permission updated.");
+    },
+    onError: (error: Error, _vars, context) => {
+      if (context?.previousCollaborators) {
+        queryClient.setQueryData(["collaborators", categoryId], context.previousCollaborators);
+      }
+      toast.error(error.message || "Failed to update role.");
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["collaborators", categoryId] });
