@@ -13,7 +13,7 @@ import {
   updateBookmarkAction,
   deleteBookmarkAction,
 } from "@/app/actions/bookmarks";
-import { deleteCategoryAction } from "@/app/actions/category";
+import { deleteCategoryAction, updateCategoryAction } from "@/app/actions/category";
 
 export { useBookmarks, useBookmarksRealtime, getBookmarksQueryKey };
 
@@ -271,15 +271,35 @@ export function useCreateCategoryMutation() {
   });
 }
 
+export function useUpdateCategoryMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ categoryId, name }: { categoryId: string; name: string }) => {
+      return await updateCategoryAction(categoryId, name);
+    },
+    onSuccess: (updatedCat) => {
+      queryClient.setQueryData<BookmarkCategory[]>(["categories"], (old = []) =>
+        old.map((c) => (c.id === updatedCat.id ? { ...c, name: updatedCat.name } : c))
+      );
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
+      toast.success("Category renamed successfully");
+    },
+    onError: (err) => {
+      toast.error(err instanceof Error ? err.message : "Failed to rename category");
+    },
+  });
+}
+
 export function useDeleteCategoryMutation(userId?: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (categoryId: string) => {
-      await deleteCategoryAction(categoryId);
+    mutationFn: async ({ categoryId, deleteBookmarks = false }: { categoryId: string; deleteBookmarks?: boolean }) => {
+      await deleteCategoryAction(categoryId, deleteBookmarks);
       return categoryId;
     },
-    onMutate: async (categoryId) => {
+    onMutate: async ({ categoryId, deleteBookmarks = false }) => {
       await queryClient.cancelQueries({ queryKey: ["categories"] });
       
       const previousCategories = queryClient.getQueryData<BookmarkCategory[]>(["categories"]) || [];
@@ -289,21 +309,27 @@ export function useDeleteCategoryMutation(userId?: string) {
         old.filter(c => c.id !== categoryId)
       );
 
-      // Also optimistically remove all bookmarks that belong to this category
       const bookmarksKey = getBookmarksQueryKey(userId);
       await queryClient.cancelQueries({ queryKey: bookmarksKey });
       const previousBookmarks = queryClient.getQueryData<BookmarkItem[]>(bookmarksKey) || [];
 
-      queryClient.setQueryData<BookmarkItem[]>(bookmarksKey, (old = []) =>
-        old.filter(bm => bm.categoryId !== categoryId && bm.category?.id !== categoryId)
-      );
+      if (deleteBookmarks) {
+        // Remove bookmarks
+        queryClient.setQueryData<BookmarkItem[]>(bookmarksKey, (old = []) =>
+          old.filter(bm => bm.categoryId !== categoryId && bm.category?.id !== categoryId)
+        );
+      } else {
+        // Uncategorize bookmarks
+        queryClient.setQueryData<BookmarkItem[]>(bookmarksKey, (old = []) =>
+          old.map(bm => (bm.categoryId === categoryId || bm.category?.id === categoryId) ? { ...bm, categoryId: null, category: null } : bm)
+        );
+      }
 
       return { previousCategories, deletedCategory, previousBookmarks, bookmarksKey };
     },
-    onError: (err, categoryId, context) => {
+    onError: (err, _vars, context) => {
       if (context?.deletedCategory) {
         queryClient.setQueryData<BookmarkCategory[]>(["categories"], (old = []) => {
-          if (old.some(c => c.id === categoryId)) return old;
           return [...old, context.deletedCategory!];
         });
       }
@@ -311,6 +337,9 @@ export function useDeleteCategoryMutation(userId?: string) {
         queryClient.setQueryData(context.bookmarksKey, context.previousBookmarks);
       }
       toast.error(err instanceof Error ? err.message : "Failed to delete category.");
+    },
+    onSuccess: () => {
+      toast.success("Category deleted successfully.");
     },
     onSettled: (_data, _error, _variables, context) => {
       queryClient.invalidateQueries({ queryKey: ["categories"] });

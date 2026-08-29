@@ -99,7 +99,7 @@ export function BookmarkContextMenu({
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: -4 }}
               transition={{ duration: 0.12, ease: "easeOut" }}
-              className="fixed z-100 w-44 rounded-xl border border-border bg-card p-1 shadow-xl text-foreground font-sans text-xs select-none"
+              className="fixed z-100 w-44 rounded-xl border border-border bg-card p-1 shadow-xl text-foreground font-sans text-xs select-none backdrop-blur-md"
               style={{
                 top: position.y,
                 left: position.x,
@@ -146,7 +146,7 @@ export function BookmarkContextMenu({
               <button
                 type="button"
                 onClick={handleDelete}
-                className="w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-rose-500 hover:bg-rose-500/10 transition-colors cursor-pointer"
+                className="w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-destructive hover:bg-destructive/10 transition-colors cursor-pointer"
               >
                 <Trash2 className="h-3.5 w-3.5" />
                 <span>Delete</span>

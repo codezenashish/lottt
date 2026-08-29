@@ -272,12 +272,12 @@ ${itemsHtml}
                     <Download className="h-3.5 w-3.5 text-muted-foreground" />
                     <span>Export Bookmarks</span>
                   </DropdownMenuSubTrigger>
-                  <DropdownMenuSubContent className="w-48 rounded-xl border border-border bg-card p-1 shadow-xl z-50">
+                  <DropdownMenuSubContent className="w-48 rounded-xl border border-border bg-card p-1 shadow-xl z-50 backdrop-blur-md">
                     <DropdownMenuItem
                       onClick={handleExportHtml}
                       className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-medium cursor-pointer"
                     >
-                      <FileText className="h-3.5 w-3.5 text-emerald-500" />
+                      <FileText className="h-3.5 w-3.5 text-primary" />
                       <div className="flex flex-col">
                         <span>HTML File</span>
                         <span className="text-[10px] text-muted-foreground">Browser format</span>
@@ -287,7 +287,7 @@ ${itemsHtml}
                       onClick={handleExportJson}
                       className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-medium cursor-pointer"
                     >
-                      <FileCode className="h-3.5 w-3.5 text-blue-500" />
+                      <FileCode className="h-3.5 w-3.5 text-primary" />
                       <div className="flex flex-col">
                         <span>JSON Backup</span>
                         <span className="text-[10px] text-muted-foreground">Raw data format</span>
@@ -307,7 +307,7 @@ ${itemsHtml}
                     )}
                     <span>Layout: {layoutMode === "grid" ? "Grid" : "List"}</span>
                   </DropdownMenuSubTrigger>
-                  <DropdownMenuSubContent className="w-40 rounded-xl border border-border bg-card p-1 shadow-xl z-50">
+                  <DropdownMenuSubContent className="w-40 rounded-xl border border-border bg-card p-1 shadow-xl z-50 backdrop-blur-md">
                     <DropdownMenuItem
                       onClick={() => handleToggleLayout("grid")}
                       className={`flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium cursor-pointer ${
@@ -344,7 +344,7 @@ ${itemsHtml}
                   }`}
                 >
                   <div className="flex items-center gap-2">
-                    <Pin className="h-3.5 w-3.5 text-amber-500" />
+                    <Pin className="h-3.5 w-3.5 text-primary" />
                     <span>Show Pinned Only</span>
                   </div>
                   {filterStatus === "pinned" && <Check className="h-3.5 w-3.5 text-primary" />}

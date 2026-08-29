@@ -1,9 +1,7 @@
 "use client";
 
 import { BookmarkCategory, BookmarkItem } from "./bookmark-card";
-import { Layers, Users } from "lucide-react";
-import { HugeiconsIcon } from "@hugeicons/react";
-import { getIconComponent } from "../utils/category-icon-registry";
+import { Users } from "lucide-react";
 import { useCategoryContextMenu } from "../hooks/use-category-context-menu";
 import { CategoryContextMenu } from "./category-context-menu";
 
@@ -49,7 +47,6 @@ export function CategoryFilter({
             : "bg-card text-muted-foreground hover:bg-muted hover:text-foreground border border-border"
         }`}
       >
-        <Layers className="h-3.5 w-3.5" />
         <span>All Bookmarks</span>
         <span
           className={`ml-0.5 rounded-full px-1.5 py-0.2 font-mono text-[10px] ${
@@ -62,11 +59,10 @@ export function CategoryFilter({
         </span>
       </button>
 
-      {/* Category Pills with Icons */}
+      {/* Category Pills */}
       {categories.map((cat) => {
         const isSelected = selectedCategoryId === cat.id;
         const count = getCategoryCount(cat.id);
-        const CatIcon = getIconComponent(cat.icon);
 
         return (
           <button
@@ -80,10 +76,9 @@ export function CategoryFilter({
                 : "bg-card text-muted-foreground hover:bg-muted hover:text-foreground border border-border"
             }`}
           >
-            <HugeiconsIcon icon={CatIcon} size={15} className="shrink-0" />
             <span>{cat.name}</span>
             {cat.isCollaborator && (
-              <Users className="w-3.5 h-3.5 text-indigo-400 shrink-0 ml-1" />
+              <Users className="w-3.5 h-3.5 text-primary shrink-0 ml-1" />
             )}
             {count > 0 && (
               <span

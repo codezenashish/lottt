@@ -94,16 +94,16 @@ export function ShareNoteDialog({
   };
 
   return createPortal(
-    <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/70 backdrop-blur-md p-4 sm:p-6 overflow-y-auto">
+    <div className="fixed inset-0 z-[110] flex items-center justify-center bg-background/80 backdrop-blur-md p-4 sm:p-6 overflow-y-auto">
       <div
-        className="my-auto w-full max-w-md flex flex-col rounded-3xl bg-card border border-border shadow-2xl overflow-hidden relative text-foreground animate-in fade-in zoom-in-95 duration-200"
+        className="my-auto w-full max-w-md flex flex-col rounded-2xl bg-card border border-border shadow-xl overflow-hidden relative text-foreground animate-in fade-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-5 border-b border-border bg-muted">
+        <div className="flex items-center justify-between px-6 py-5 border-b border-border bg-muted/40">
           <div className="flex items-center gap-3 min-w-0 pr-2">
             <div className="p-2 bg-primary/10 rounded-xl shrink-0">
-              <Share2 className="w-5 h-5 text-foreground" />
+              <Share2 className="w-5 h-5 text-primary" />
             </div>
             <div className="min-w-0">
               <h2 className="text-lg font-sans font-bold text-foreground tracking-tight truncate">
@@ -117,7 +117,7 @@ export function ShareNoteDialog({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-full p-2 text-muted-foreground hover:text-foreground hover:bg-card transition cursor-pointer shrink-0"
+            className="rounded-full p-2 text-muted-foreground hover:text-foreground hover:bg-muted transition cursor-pointer shrink-0"
           >
             <X className="h-5 w-5" />
           </button>
@@ -126,16 +126,16 @@ export function ShareNoteDialog({
         {/* Body */}
         <div className="p-6 space-y-6">
           {error && (
-            <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-xs font-medium">
+            <div className="p-3 rounded-xl bg-destructive/10 border border-destructive/20 text-destructive text-xs font-medium">
               {error}
             </div>
           )}
 
           {/* Public Access Toggle */}
-          <div className="flex items-center justify-between p-4 rounded-2xl bg-background border border-border">
+          <div className="flex items-center justify-between p-4 rounded-xl bg-background border border-border">
             <div className="flex flex-col">
               <span className="text-sm font-semibold text-foreground flex items-center gap-2">
-                <Globe className="w-4 h-4 text-emerald-400" />
+                <Globe className="w-4 h-4 text-primary" />
                 Public Link Access
               </span>
               <span className="text-xs text-muted-foreground mt-1 max-w-[200px]">
@@ -147,12 +147,12 @@ export function ShareNoteDialog({
               onClick={handleToggleShare}
               disabled={isLoading}
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
-                isShared ? "bg-emerald-500" : "bg-border"
+                isShared ? "bg-primary" : "bg-muted border border-border"
               }`}
             >
               <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                  isShared ? "translate-x-6" : "translate-x-1"
+                className={`inline-block h-4 w-4 transform rounded-full bg-background transition-transform ${
+                  isShared ? "translate-x-6 bg-primary-foreground" : "translate-x-1"
                 }`}
               />
             </button>
@@ -175,11 +175,11 @@ export function ShareNoteDialog({
                 />
                 <button
                   onClick={handleCopyLink}
-                  className="flex items-center justify-center p-2.5 rounded-xl bg-primary text-primary-foreground hover:bg-primary/80 transition shadow-sm cursor-pointer shrink-0"
+                  className="flex items-center justify-center p-2.5 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 transition shadow-xs cursor-pointer shrink-0"
                   title="Copy to clipboard"
                 >
                   {copied ? (
-                    <Check className="w-5 h-5 text-emerald-400" />
+                    <Check className="w-5 h-5" />
                   ) : (
                     <Copy className="w-5 h-5" />
                   )}
@@ -192,7 +192,7 @@ export function ShareNoteDialog({
           <div className="pt-4 border-t border-border space-y-4">
             <div className="flex flex-col">
               <span className="text-sm font-semibold text-foreground flex items-center gap-2">
-                <Users className="w-4 h-4 text-indigo-500" />
+                <Users className="w-4 h-4 text-primary" />
                 Friend / Collaborator Sharing
               </span>
               <span className="text-xs text-muted-foreground mt-1">
@@ -206,7 +206,7 @@ export function ShareNoteDialog({
                 placeholder="friend@example.com"
                 value={inviteEmail}
                 onChange={(e) => setInviteEmail(e.target.value)}
-                className="flex-1 px-4 py-2.5 rounded-xl bg-background border border-border text-muted-foreground text-sm focus:outline-none focus:border-indigo-500 transition"
+                className="flex-1 px-4 py-2.5 rounded-xl bg-background border border-border text-foreground placeholder:text-muted-foreground text-sm focus:outline-none focus:border-primary transition"
               />
               <div className="flex gap-2">
                 <select
@@ -220,7 +220,7 @@ export function ShareNoteDialog({
                 <button
                   type="submit"
                   disabled={inviteMutation.isPending || !inviteEmail.trim()}
-                  className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-indigo-500 text-white font-semibold text-xs hover:bg-indigo-600 transition disabled:opacity-50 cursor-pointer shrink-0"
+                  className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-xs hover:bg-primary/90 transition disabled:opacity-50 cursor-pointer shrink-0"
                 >
                   {inviteMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <UserPlus className="w-4 h-4" />}
                   Invite
@@ -253,7 +253,7 @@ export function ShareNoteDialog({
                           type="button"
                           onClick={() => removeMutation.mutate(collab.user.id)}
                           disabled={removeMutation.isPending}
-                          className="p-1.5 rounded-lg text-rose-400 hover:bg-rose-500/10 transition cursor-pointer"
+                          className="p-1.5 rounded-lg text-destructive hover:bg-destructive/10 transition cursor-pointer"
                           title="Remove access"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -268,11 +268,11 @@ export function ShareNoteDialog({
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-border bg-muted flex justify-end">
+        <div className="px-6 py-4 border-t border-border bg-muted/40 flex justify-end">
           <button
             type="button"
             onClick={onClose}
-            className="px-5 py-2 rounded-xl bg-background border border-border text-xs font-semibold text-foreground hover:bg-card transition cursor-pointer shadow-sm"
+            className="px-5 py-2 rounded-xl bg-background border border-border text-xs font-semibold text-foreground hover:bg-muted transition cursor-pointer shadow-xs"
           >
             Done
           </button>

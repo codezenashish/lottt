@@ -1,10 +1,7 @@
 "use client";
 
-import { HugeiconsIcon } from "@hugeicons/react";
-import { Folder01Icon } from "@hugeicons/core-free-icons";
 import { cn } from "@/lib/utils";
 import { BookmarkItem, BookmarkCategory } from "./bookmark-card";
-import { getIconComponent } from "../utils/category-icon-registry";
 import BookmarkCard from "./bookmark-card";
 import BookmarkRow from "./bookmark-row";
 
@@ -31,16 +28,9 @@ export default function BookmarkList({
       className={cn(viewType === "list" ? "flex flex-col gap-8" : "space-y-8")}
     >
       {categories.map((category) => {
-        const categoryIcon = getIconComponent(category.icon) || Folder01Icon;
-
         return (
           <section key={category.id}>
             <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold text-foreground font-sans tracking-tight">
-              <HugeiconsIcon
-                icon={categoryIcon}
-                size={16}
-                className="text-muted-foreground"
-              />
               <span>{category.name}</span>
               <span className="rounded-full bg-muted border border-border px-2 py-0.2 font-mono text-[11px] font-normal text-muted-foreground">
                 {category.bookmarks.length}

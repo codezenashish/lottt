@@ -3,8 +3,6 @@ import { db } from "@/db";
 import { categories } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
 import { BookmarkCard, BookmarkItem } from "@/features/bookmarks/components/bookmark-card";
-import { getIconComponent } from "@/features/bookmarks/utils/category-icon-registry";
-import { HugeiconsIcon } from "@hugeicons/react";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
@@ -34,7 +32,6 @@ export default async function SharedCategoryPage({
       bookmarks: {
         with: {
           category: true,
-          // tags: true, // tags might be needed if you display them
         }
       },
     },
@@ -44,7 +41,6 @@ export default async function SharedCategoryPage({
     notFound();
   }
 
-  const categoryIcon = getIconComponent(sharedCategory.icon);
   const ownerName = sharedCategory.user?.name || sharedCategory.user?.email || "Someone";
 
   return (
@@ -60,7 +56,7 @@ export default async function SharedCategoryPage({
         </div>
         <Link
           href="/"
-          className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-xs font-medium text-primary-foreground hover:bg-primary/80 transition shadow-sm"
+          className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition shadow-xs"
         >
           Create your own
         </Link>
@@ -68,20 +64,12 @@ export default async function SharedCategoryPage({
 
       <main className="max-w-6xl mx-auto px-4 md:px-8 py-12">
         {/* Category Info */}
-        <div className="flex flex-col items-center text-center space-y-6 mb-16 animate-in fade-in slide-in-from-bottom-4 duration-700">
-          <div className="p-4 rounded-3xl bg-card border border-border shadow-sm relative overflow-hidden group">
-             <div 
-               className="absolute inset-0 opacity-20 group-hover:opacity-30 transition duration-500" 
-               style={{ backgroundColor: sharedCategory.color }} 
-             />
-             <HugeiconsIcon icon={categoryIcon} size={48} className="text-foreground relative z-10" />
-          </div>
-          
+        <div className="flex flex-col items-center text-center space-y-4 mb-16 animate-in fade-in slide-in-from-bottom-4 duration-700">
           <div className="space-y-2">
             <h1 className="text-4xl md:text-5xl font-sans font-bold tracking-tight text-foreground">
               {sharedCategory.name}
             </h1>
-            <p className="text-lg text-muted-foreground max-w-xl mx-auto">
+            <p className="text-base text-muted-foreground max-w-xl mx-auto">
               A curated collection by <span className="font-semibold text-foreground">{ownerName}</span>
             </p>
           </div>

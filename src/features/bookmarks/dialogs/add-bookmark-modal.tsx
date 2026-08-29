@@ -7,9 +7,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { BookmarkItem, BookmarkCategory } from "../components/bookmark-card";
 import { bookmarkSchema } from "@/lib/validations/bookmark";
 import { useBookmarkStore } from "@/store/useBookmarkStore";
-import { IconsPicker } from "../components/icons-picker";
-import { getIconComponent } from "../utils/category-icon-registry";
-import { HugeiconsIcon } from "@hugeicons/react";
 import { X, Check, Globe, Sparkles, Loader2 } from "lucide-react";
 
 interface AddBookmarkModalProps {
@@ -347,7 +344,6 @@ function AddBookmarkForm({
                   None
                 </button>
                 {categories.map((cat) => {
-                  const CatIcon = getIconComponent(cat.icon);
                   const isSelected = selectedCategoryId === cat.id;
                   return (
                     <button
@@ -356,15 +352,13 @@ function AddBookmarkForm({
                       onClick={() => {
                         setSelectedCategoryId(cat.id);
                         setCategoryName(cat.name);
-                        if (cat.icon) setCategoryIcon(cat.icon);
                       }}
-                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium border transition cursor-pointer ${
+                      className={`inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-medium border transition cursor-pointer ${
                         isSelected
                           ? "bg-primary text-primary-foreground border-foreground"
                           : "bg-muted text-muted-foreground border-border hover:border-foreground"
                       }`}
                     >
-                      <HugeiconsIcon icon={CatIcon} size={14} className="shrink-0" />
                       <span>{cat.name}</span>
                     </button>
                   );
@@ -382,16 +376,6 @@ function AddBookmarkForm({
               placeholder="Category name (e.g. Design, Development, Tools)..."
               className="w-full px-4 py-2.5 rounded-xl bg-card border border-border text-foreground text-sm focus:outline-none focus:border-foreground transition"
             />
-
-            <div className="pt-1">
-              <label className="block text-[11px] font-medium text-muted-foreground mb-1">
-                Category Icon
-              </label>
-              <IconsPicker
-                selectedIcon={categoryIcon}
-                onSelectIcon={(icon) => setCategoryIcon(icon)}
-              />
-            </div>
           </div>
 
           <div className="flex justify-end gap-3 pt-4 border-t border-border">

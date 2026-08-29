@@ -30,37 +30,8 @@ export function CategoryContextMenu({
 }: CategoryContextMenuProps) {
   if (!category) return null;
 
-  const shareUrl = category.shareToken
-    ? `${typeof window !== "undefined" ? window.location.origin : ""}/shared/c/${category.shareToken}`
-    : "";
-
-  const handleCopyLink = () => {
-    if (shareUrl) {
-      navigator.clipboard.writeText(shareUrl);
-      toast.success("Share link copied to clipboard");
-    } else {
-      toast.error("Category is not shared yet");
-    }
-    onClose();
-  };
-
   const handleShareClick = () => {
     onShareClick(category);
-    onClose();
-  };
-
-  const handleRevokeShare = async () => {
-    try {
-      const res = await fetch(`/api/category/${category.id}/share`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ isShared: false }),
-      });
-      if (!res.ok) throw new Error("Failed to revoke share");
-      toast.success("Public access revoked");
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "An error occurred");
-    }
     onClose();
   };
 
@@ -92,64 +63,40 @@ export function CategoryContextMenu({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: -4 }}
             transition={{ duration: 0.12, ease: "easeOut" }}
-            className="fixed z-100 w-48 rounded-xl border border-border bg-card shadow-xl py-1.5 px-1 font-sans text-xs text-foreground select-none"
+            className="fixed z-100 w-48 rounded-xl border border-border bg-card p-1 shadow-xl font-sans text-xs text-foreground select-none backdrop-blur-md"
             style={{
               top: position.y,
               left: position.x,
             }}
           >
-            <div className="px-2.5 py-2 mb-1 border-b border-border">
+            <div className="px-2.5 py-1.5 mb-1 border-b border-border">
               <p className="text-xs font-semibold text-foreground truncate">{category.name}</p>
-              <p className="text-[10px] text-muted-foreground">
-                {category.isShared ? "Publicly Shared" : "Private"}
-              </p>
             </div>
 
             <button
               type="button"
               onClick={handleShareClick}
-              className="w-full flex items-center gap-2.5 px-2.5 py-1.5 text-xs text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors cursor-pointer"
+              className="w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
             >
               <Share2 className="h-3.5 w-3.5" />
-              <span>{category.isShared ? "Manage Share" : "Share Category"}</span>
+              <span>Share Category</span>
             </button>
 
-            {category.isShared && (
-              <>
-                <button
-                  type="button"
-                  onClick={handleCopyLink}
-                  className="w-full flex items-center gap-2.5 px-2.5 py-1.5 text-xs text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors cursor-pointer"
-                >
-                  <Copy className="h-3.5 w-3.5" />
-                  <span>Copy Share Link</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={handleRevokeShare}
-                  className="w-full flex items-center gap-2.5 px-2.5 py-1.5 text-xs text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors cursor-pointer"
-                >
-                  <ShieldOff className="h-3.5 w-3.5" />
-                  <span>Revoke Share</span>
-                </button>
-              </>
-            )}
+            <button
+              type="button"
+              onClick={handleEdit}
+              className="w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
+            >
+              <Edit2 className="h-3.5 w-3.5" />
+              <span>Edit Category Name</span>
+            </button>
 
             <div className="h-px bg-border my-1 w-full" />
 
             <button
               type="button"
-              onClick={handleEdit}
-              className="w-full flex items-center gap-2.5 px-2.5 py-1.5 text-xs text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors cursor-pointer"
-            >
-              <Edit2 className="h-3.5 w-3.5" />
-              <span>Edit Category</span>
-            </button>
-
-            <button
-              type="button"
               onClick={handleDelete}
-              className="w-full flex items-center gap-2.5 px-2.5 py-1.5 text-xs text-rose-500 hover:bg-rose-500/10 rounded-md transition-colors cursor-pointer"
+              className="w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-destructive hover:bg-destructive/10 transition-colors cursor-pointer"
             >
               <Trash2 className="h-3.5 w-3.5" />
               <span>Delete Category</span>
