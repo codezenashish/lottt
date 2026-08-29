@@ -1,7 +1,6 @@
 import type { ComponentProps } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
-  DashboardSquare03Icon,
   Bookmark01Icon,
   Note01Icon,
   Settings02Icon
@@ -18,15 +17,9 @@ export interface SidebarItem {
 
 export const sidebar: SidebarItem[] = [
   {
-    label: "Dashboard",
-    href: "/dashboard",
-    icon: DashboardSquare03Icon,
-  },
-  {
     label: "Bookmarks",
     href: "/bookmarks",
     icon: Bookmark01Icon,
-   
   },
   {
     label: "Notes",
@@ -34,8 +27,8 @@ export const sidebar: SidebarItem[] = [
     icon: Note01Icon,
   },
   {
-    label:"Setting",
-    href:"/setting",
-    icon:Settings02Icon
+    label: "Setting",
+    href: "/setting",
+    icon: Settings02Icon,
   }
 ];

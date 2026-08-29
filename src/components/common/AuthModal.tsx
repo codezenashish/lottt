@@ -81,7 +81,7 @@ export default function AuthModal({
           setErrorMsg(error.message);
         } else {
           onClose();
-          router.push("/dashboard");
+          router.push("/bookmarks");
           router.refresh();
         }
       } else {
@@ -90,7 +90,7 @@ export default function AuthModal({
           setErrorMsg(error.message);
         } else {
           onClose();
-          router.push("/dashboard");
+          router.push("/bookmarks");
           router.refresh();
         }
       }

@@ -7,8 +7,8 @@ import { useBookmarkStore } from "@/store/useBookmarkStore";
 import { useBookmarks } from "@/hooks/use-bookmarks";
 import { useBookmarksRealtime } from "@/hooks/use-bookmarks-realtime";
 import { useCategoriesQuery } from "@/features/bookmarks/hooks/use-bookmark-queries";
+import { BookmarkHeader } from "@/features/bookmarks/components/bookmark-header";
 import { BookmarkGrid } from "@/features/bookmarks/components/bookmark-grid";
-import { AdvancedFilters } from "@/features/bookmarks/components/advanced-filters";
 import { AddBookmarkModal } from "@/features/bookmarks/dialogs/add-bookmark-modal";
 import { ImportBookmarksModal } from "@/features/bookmarks/dialogs/import-bookmarks-modal";
 import { BookmarkItem, BookmarkCategory } from "@/features/bookmarks/components/bookmark-card";
@@ -230,10 +230,7 @@ export default function BookmarksPage() {
 
 
 
-      {/* Advanced Filters */}
-      <div className="mt-2 mb-4">
-        <AdvancedFilters bookmarks={bookmarks} />
-      </div>
+      <BookmarkHeader />
 
       {/* Bookmark Grid / List */}
       <BookmarkGrid

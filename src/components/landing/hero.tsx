@@ -31,7 +31,7 @@ export function Hero() {
 
   const handleStartClick = () => {
     if (isSignedIn) {
-      router.push("/dashboard");
+      router.push("/bookmarks");
     } else {
       setIsAuthOpen(true);
     }

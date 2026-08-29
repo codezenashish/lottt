@@ -59,7 +59,6 @@ export async function proxy(request: NextRequest) {
     } = await supabase.auth.getUser();
 
     const protectedRoutes = [
-      "/dashboard",
       "/bookmarks",
       "/notes",
       "/setting",

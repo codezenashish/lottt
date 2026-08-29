@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useSyncExternalStore } from "react";
 import Image from "next/image";
 import { createPortal } from "react-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import { BookmarkItem, BookmarkCategory } from "../components/bookmark-card";
 import { bookmarkSchema } from "@/lib/validations/bookmark";
 import { useBookmarkStore } from "@/store/useBookmarkStore";
@@ -45,16 +46,20 @@ export function AddBookmarkModal({
 }: AddBookmarkModalProps) {
   const mounted = useIsMounted();
 
-  if (!isOpen || !mounted) return null;
+  if (!mounted) return null;
 
   return (
-    <AddBookmarkForm
-      key={initialData ? initialData.id : "new-bookmark"}
-      onClose={onClose}
-      onSave={onSave}
-      categories={categories}
-      initialData={initialData}
-    />
+    <AnimatePresence>
+      {isOpen && (
+        <AddBookmarkForm
+          key={initialData ? initialData.id : "new-bookmark"}
+          onClose={onClose}
+          onSave={onSave}
+          categories={categories}
+          initialData={initialData}
+        />
+      )}
+    </AnimatePresence>
   );
 }
 
@@ -217,12 +222,23 @@ function AddBookmarkForm({
   };
 
   return createPortal(
-    <div className="fixed inset-0 z-100 flex items-center justify-center overflow-y-auto bg-black/70 backdrop-blur-md p-4 sm:p-6">
-      <div className="my-auto w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl bg-card border border-border p-6 shadow-2xl relative text-foreground animate-in fade-in zoom-in-95 duration-200 scrollbar-none">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-100 flex items-center justify-center overflow-y-auto bg-black/70 backdrop-blur-md p-4 sm:p-6"
+    >
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95, y: 10 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95, y: 10 }}
+        transition={{ duration: 0.2, ease: "easeOut" }}
+        className="my-auto w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl bg-card border border-border p-6 shadow-2xl relative text-foreground scrollbar-none"
+      >
         <button
           type="button"
           onClick={() => onClose()}
-          className="absolute top-4 right-4 rounded-full p-2 text-muted-foreground hover:text-foreground hover:bg-muted transition cursor-pointer"
+          className="absolute top-4 right-4 rounded-full p-2 text-muted-foreground hover:text-foreground hover:bg-muted transition cursor-pointer font-sans"
         >
           <X className="h-5 w-5" />
         </button>
@@ -230,11 +246,11 @@ function AddBookmarkForm({
         <h2 className="text-xl font-sans font-semibold text-foreground mb-1">
           {initialData ? "Edit Bookmark" : "Add New Bookmark"}
         </h2>
-        <p className="text-xs text-muted-foreground mb-6">
+        <p className="text-xs text-muted-foreground mb-6 font-sans">
           Save a web resource with custom title and category
         </p>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 font-sans">
           <div>
             <label className="block text-xs font-medium text-muted-foreground mb-1.5 uppercase tracking-wider font-mono">
               Website URL *
@@ -270,14 +286,14 @@ function AddBookmarkForm({
 
               <div className="absolute right-3 flex items-center">
                 {isFetchingMeta ? (
-                  <Loader2 className="h-4 w-4 text-indigo-400 animate-spin" />
+                  <Loader2 className="h-4 w-4 text-primary animate-spin" />
                 ) : (
                   <button
                     type="button"
                     onClick={() => handleFetchMetadata()}
                     disabled={!url.trim()}
                     title="Auto-fetch Title"
-                    className="text-muted-foreground hover:text-indigo-400 disabled:opacity-30 transition cursor-pointer"
+                    className="text-muted-foreground hover:text-primary disabled:opacity-30 transition cursor-pointer"
                   >
                     <Sparkles className="h-4 w-4" />
                   </button>
@@ -386,17 +402,19 @@ function AddBookmarkForm({
             >
               Cancel
             </button>
-            <button
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
               type="submit"
-              className="inline-flex items-center gap-2 px-5 py-2 rounded-xl bg-primary text-primary-foreground font-medium text-xs hover:bg-primary/80 transition shadow-sm active:translate-y-px cursor-pointer"
+              className="inline-flex items-center gap-2 px-5 py-2 rounded-xl bg-primary text-primary-foreground font-medium text-xs hover:bg-primary/80 transition shadow-sm cursor-pointer"
             >
               <Check className="h-3.5 w-3.5" />
               <span>{initialData ? "Save Changes" : "Add Bookmark"}</span>
-            </button>
+            </motion.button>
           </div>
         </form>
-      </div>
-    </div>,
+      </motion.div>
+    </motion.div>,
     document.body
   );
 }

@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-// import Image from "next/image";
+import { motion } from "framer-motion";
+import { toast } from "sonner";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   GlobalIcon,
@@ -57,7 +58,6 @@ interface BookmarkCardProps {
 
 export function BookmarkCard({
   bookmark,
-  // onEdit,
   onInlineEdit,
   onDelete,
   onPin,
@@ -70,7 +70,6 @@ export function BookmarkCard({
   const [isEditing, setIsEditing] = useState(false);
   const [inlineTitle, setInlineTitle] = useState(bookmark.title);
 
-  // Extract hostname domain for fallback favicon
   const getDomain = (url: string) => {
     try {
       const parsed = new URL(url.startsWith("http") ? url : `https://${url}`);
@@ -92,6 +91,7 @@ export function BookmarkCard({
     }
     if (onDelete) {
       onDelete(bookmark);
+      toast.success("Bookmark removed");
     }
   };
 
@@ -100,6 +100,7 @@ export function BookmarkCard({
     e.stopPropagation();
     if (onPin) {
       onPin(bookmark.id);
+      toast.success(bookmark.isPinned ? "Bookmark unpinned" : "Bookmark pinned");
     }
   };
 
@@ -108,6 +109,7 @@ export function BookmarkCard({
       e.preventDefault();
       if (onInlineEdit && inlineTitle.trim() !== bookmark.title) {
         onInlineEdit(bookmark.id, inlineTitle.trim());
+        toast.success("Title updated");
       }
       setIsEditing(false);
     } else if (e.key === "Escape") {
@@ -133,7 +135,6 @@ export function BookmarkCard({
           </div>
         )}
         
-        {/* Checkbox for Selection Mode */}
         {(selectionMode || isSelected) && (
           <div 
             className="absolute -top-1.5 -left-1.5 flex h-5 w-5 items-center justify-center rounded bg-card ring-1 ring-border"
@@ -162,6 +163,7 @@ export function BookmarkCard({
             onBlur={() => {
               if (onInlineEdit && inlineTitle.trim() !== bookmark.title) {
                 onInlineEdit(bookmark.id, inlineTitle.trim());
+                toast.success("Title updated");
               }
               setIsEditing(false);
             }}
@@ -186,17 +188,15 @@ export function BookmarkCard({
       onEditInline={() => setIsEditing(true)}
       onDelete={handleDelete}
     >
-      <article 
-        className={`group flex min-w-0 items-center gap-3 rounded-xl border p-3 shadow-xs transition-all duration-200 hover:shadow-md relative ${
+      <motion.article 
+        whileHover={{ y: -2 }}
+        transition={{ duration: 0.15 }}
+        className={`group flex min-w-0 items-center gap-3 rounded-xl border p-3 shadow-xs transition-colors duration-200 hover:shadow-md relative ${
           isSelected 
             ? "border-foreground/50 bg-primary/5 ring-1 ring-ring/20" 
-            : "border-border bg-card hover:border-foreground/20 hover:bg-muted"
+            : "border-border bg-card hover:border-foreground/20 hover:bg-muted/70"
         }`}
-        onMouseEnter={() => {
-          // Optional: show checkbox on hover if not in selection mode
-        }}
       >
-        {/* Checkbox Overlay on hover (if not in selection mode and not selected) */}
         {!selectionMode && !isSelected && onToggleSelect && (
           <div 
             className="absolute -top-1.5 -left-1.5 flex h-5 w-5 items-center justify-center rounded bg-card ring-1 ring-border opacity-0 group-hover:opacity-100 transition-opacity z-10"
@@ -278,7 +278,7 @@ export function BookmarkCard({
             <HugeiconsIcon icon={Delete02Icon} size={15} />
           </button>
         )}
-      </article>
+      </motion.article>
     </BookmarkContextMenu>
   );
 }

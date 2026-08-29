@@ -1,5 +1,6 @@
 "use client";
 
+import { motion, AnimatePresence } from "framer-motion";
 import { BookmarkCard, BookmarkItem } from "./bookmark-card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Bookmark, Plus } from "lucide-react";
@@ -72,7 +73,12 @@ export function BookmarkGrid({
   // Empty State
   if (!bookmarks || bookmarks.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-card/50 py-16 px-6 text-center">
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+        className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-card/50 py-16 px-6 text-center"
+      >
         <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-card border border-border mb-4 shadow-inner">
           <Bookmark className="h-7 w-7 text-muted-foreground" />
         </div>
@@ -84,16 +90,18 @@ export function BookmarkGrid({
         </p>
 
         {onAddClick && (
-          <button
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             type="button"
             onClick={onAddClick}
             className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-xs font-medium text-primary-foreground hover:bg-primary/80 transition shadow-sm active:translate-y-px cursor-pointer"
           >
             <Plus className="h-4 w-4" />
             <span>Add your first bookmark</span>
-          </button>
+          </motion.button>
         )}
-      </div>
+      </motion.div>
     );
   }
 
@@ -106,20 +114,30 @@ export function BookmarkGrid({
           : "flex flex-col gap-3"
       }
     >
-      {bookmarks.map((bookmark) => (
-        <BookmarkCard
-          key={bookmark.id}
-          bookmark={bookmark}
-          layoutMode={layoutMode}
-          isSelected={selectedBookmarkIds.includes(bookmark.id)}
-          onToggleSelect={onToggleSelect}
-          selectionMode={selectedBookmarkIds.length > 0}
-          onEdit={onEdit}
-          onInlineEdit={onInlineEdit}
-          onDelete={onDelete}
-          onPin={onPin}
-        />
-      ))}
+      <AnimatePresence mode="popLayout">
+        {bookmarks.map((bookmark) => (
+          <motion.div
+            key={bookmark.id}
+            layout
+            initial={{ opacity: 0, scale: 0.95, y: 10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.9, y: -10 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+          >
+            <BookmarkCard
+              bookmark={bookmark}
+              layoutMode={layoutMode}
+              isSelected={selectedBookmarkIds.includes(bookmark.id)}
+              onToggleSelect={onToggleSelect}
+              selectionMode={selectedBookmarkIds.length > 0}
+              onEdit={onEdit}
+              onInlineEdit={onInlineEdit}
+              onDelete={onDelete}
+              onPin={onPin}
+            />
+          </motion.div>
+        ))}
+      </AnimatePresence>
     </div>
   );
 }

@@ -2,12 +2,14 @@
 
 import { useState, useRef, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import { toast } from "sonner";
 import { X, UploadCloud, FileType2, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
 
 interface ImportBookmarksModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess: () => void; // To refresh data if needed
+  onSuccess: () => void;
 }
 
 const emptySubscribe = () => () => {};
@@ -28,10 +30,12 @@ interface ParsedBookmark {
 export function ImportBookmarksModal({ isOpen, onClose, onSuccess }: ImportBookmarksModalProps) {
   const mounted = useIsMounted();
 
-  if (!isOpen || !mounted) return null;
+  if (!mounted) return null;
 
   return (
-    <ImportBookmarksForm onClose={onClose} onSuccess={onSuccess} />
+    <AnimatePresence>
+      {isOpen && <ImportBookmarksForm onClose={onClose} onSuccess={onSuccess} />}
+    </AnimatePresence>
   );
 }
 
@@ -71,7 +75,6 @@ function ImportBookmarksForm({ onClose, onSuccess }: { onClose: () => void; onSu
           }
         }
         
-        // Exclude root "Bookmarks bar" or "Bookmarks menu" if we want, or keep them
         if (categoryName === "Bookmarks Bar" || categoryName === "Bookmarks Menu") {
           categoryName = undefined;
         }
@@ -86,22 +89,28 @@ function ImportBookmarksForm({ onClose, onSuccess }: { onClose: () => void; onSu
       if (bookmarks.length === 0) {
         setErrorMessage("No valid bookmarks found in the file.");
         setStep("error");
+        toast.error("No valid bookmarks found in file.");
         return;
       }
       
       setParsedBookmarks(bookmarks);
       setStep("preview");
+      toast.info(`Found ${bookmarks.length} bookmarks ready for import.`);
     } catch (error) {
       console.error("Failed to parse HTML", error);
-      setErrorMessage("Failed to parse the uploaded file. Please ensure it is a valid browser bookmark HTML export.");
+      const msg = "Failed to parse the uploaded file. Please ensure it is a valid browser bookmark HTML export.";
+      setErrorMessage(msg);
       setStep("error");
+      toast.error("Failed to parse bookmark file.");
     }
   };
 
   const handleFileUpload = (file: File) => {
     if (file.type !== "text/html" && !file.name.endsWith(".html")) {
-      setErrorMessage("Please upload a valid HTML file.");
+      const msg = "Please upload a valid HTML file.";
+      setErrorMessage(msg);
       setStep("error");
+      toast.error(msg);
       return;
     }
     
@@ -136,6 +145,7 @@ function ImportBookmarksForm({ onClose, onSuccess }: { onClose: () => void; onSu
 
   const handleImport = async () => {
     setStep("importing");
+    const toastId = toast.loading("Importing bookmarks into collection...");
     
     try {
       const res = await fetch("/api/bookmarks/import", {
@@ -158,16 +168,30 @@ function ImportBookmarksForm({ onClose, onSuccess }: { onClose: () => void; onSu
         skippedCount: data.skippedCount,
       });
       setStep("success");
+      toast.success(`Successfully imported ${data.importedCount} bookmarks!`, { id: toastId });
       onSuccess();
     } catch (error: unknown) {
-      setErrorMessage(error instanceof Error ? error.message : "An unexpected error occurred during import.");
+      const msg = error instanceof Error ? error.message : "An unexpected error occurred during import.";
+      setErrorMessage(msg);
       setStep("error");
+      toast.error(msg, { id: toastId });
     }
   };
 
   return createPortal(
-    <div className="fixed inset-0 z-100 flex items-center justify-center overflow-y-auto bg-black/70 backdrop-blur-md p-4 sm:p-6">
-      <div className="my-auto w-full max-w-md overflow-hidden rounded-2xl bg-card border border-border shadow-2xl relative text-foreground animate-in fade-in zoom-in-95 duration-200">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-100 flex items-center justify-center overflow-y-auto bg-black/70 backdrop-blur-md p-4 sm:p-6"
+    >
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95, y: 10 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95, y: 10 }}
+        transition={{ duration: 0.2, ease: "easeOut" }}
+        className="my-auto w-full max-w-md overflow-hidden rounded-2xl bg-card border border-border shadow-2xl relative text-foreground"
+      >
         <button
           type="button"
           onClick={onClose}
@@ -176,8 +200,8 @@ function ImportBookmarksForm({ onClose, onSuccess }: { onClose: () => void; onSu
           <X className="h-5 w-5" />
         </button>
 
-        <div className="p-6">
-          <h2 className="text-xl font-sans font-semibold text-foreground mb-1">
+        <div className="p-6 font-sans">
+          <h2 className="text-xl font-semibold text-foreground mb-1">
             Import Bookmarks
           </h2>
           <p className="text-xs text-muted-foreground mb-6">
@@ -209,13 +233,15 @@ function ImportBookmarksForm({ onClose, onSuccess }: { onClose: () => void; onSu
                   }
                 }}
               />
-              <button
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
                 className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-xs font-medium text-primary-foreground hover:bg-primary/80 transition shadow-sm cursor-pointer"
               >
                 Browse File
-              </button>
+              </motion.button>
             </div>
           )}
 
@@ -223,8 +249,8 @@ function ImportBookmarksForm({ onClose, onSuccess }: { onClose: () => void; onSu
           {step === "preview" && (
             <div className="space-y-6">
               <div className="rounded-xl border border-border bg-card p-4 flex items-center gap-4">
-                <div className="h-10 w-10 rounded-lg bg-indigo-500/10 flex items-center justify-center">
-                  <FileType2 className="h-5 w-5 text-indigo-500" />
+                <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <FileType2 className="h-5 w-5 text-primary" />
                 </div>
                 <div>
                   <h3 className="text-sm font-medium text-foreground">Ready to Import</h3>
@@ -235,13 +261,13 @@ function ImportBookmarksForm({ onClose, onSuccess }: { onClose: () => void; onSu
                 </div>
               </div>
 
-              <label className="flex items-start gap-3 cursor-pointer p-3 rounded-xl hover:bg-card transition">
+              <label className="flex items-start gap-3 cursor-pointer p-3 rounded-xl hover:bg-muted/50 transition">
                 <div className="flex items-center h-5">
                   <input
                     type="checkbox"
                     checked={skipDuplicates}
                     onChange={(e) => setSkipDuplicates(e.target.checked)}
-                    className="w-4 h-4 rounded text-indigo-500 focus:ring-indigo-500 bg-muted border-border"
+                    className="w-4 h-4 rounded text-primary focus:ring-primary bg-muted border-border"
                   />
                 </div>
                 <div className="flex flex-col">
@@ -258,13 +284,15 @@ function ImportBookmarksForm({ onClose, onSuccess }: { onClose: () => void; onSu
                 >
                   Back
                 </button>
-                <button
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                   type="button"
                   onClick={handleImport}
                   className="inline-flex items-center gap-2 px-5 py-2 rounded-xl bg-primary text-primary-foreground font-medium text-xs hover:bg-primary/80 transition shadow-sm cursor-pointer"
                 >
                   Start Import
-                </button>
+                </motion.button>
               </div>
             </div>
           )}
@@ -272,7 +300,7 @@ function ImportBookmarksForm({ onClose, onSuccess }: { onClose: () => void; onSu
           {/* IMPORTING STEP */}
           {step === "importing" && (
             <div className="flex flex-col items-center justify-center py-8 space-y-4">
-              <Loader2 className="h-8 w-8 text-indigo-500 animate-spin" />
+              <Loader2 className="h-8 w-8 text-primary animate-spin" />
               <div className="text-center">
                 <h3 className="text-sm font-medium text-foreground">Importing Bookmarks...</h3>
                 <p className="text-xs text-muted-foreground mt-1">Please wait while we save your bookmarks.</p>
@@ -295,13 +323,15 @@ function ImportBookmarksForm({ onClose, onSuccess }: { onClose: () => void; onSu
                   )}
                 </p>
               </div>
-              <button
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
                 type="button"
                 onClick={onClose}
                 className="w-full inline-flex justify-center items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/80 transition shadow-sm cursor-pointer"
               >
                 Close & View Bookmarks
-              </button>
+              </motion.button>
             </div>
           )}
 
@@ -325,19 +355,21 @@ function ImportBookmarksForm({ onClose, onSuccess }: { onClose: () => void; onSu
                 >
                   Cancel
                 </button>
-                <button
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                   type="button"
                   onClick={() => setStep("upload")}
                   className="flex-1 rounded-xl bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/80 transition shadow-sm cursor-pointer"
                 >
                   Try Again
-                </button>
+                </motion.button>
               </div>
             </div>
           )}
         </div>
-      </div>
-    </div>,
+      </motion.div>
+    </motion.div>,
     document.body
   );
 }

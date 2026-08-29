@@ -73,13 +73,7 @@ export function CommandMenu() {
       <CommandList>
         <CommandEmpty>No results found.</CommandEmpty>
 
-        {/* Navigation Group */}
         <CommandGroup heading="Navigation">
-          <CommandItem onSelect={() => runCommand(() => router.push("/dashboard"))}>
-            <LayoutDashboard className="h-4 w-4 mr-2 text-amber-500" />
-            <span>Dashboard</span>
-            <CommandShortcut>↵</CommandShortcut>
-          </CommandItem>
 
           <CommandItem onSelect={() => runCommand(() => router.push("/bookmarks"))}>
             <Bookmark className="h-4 w-4 mr-2 text-emerald-500" />
